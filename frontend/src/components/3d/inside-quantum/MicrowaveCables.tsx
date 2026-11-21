@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import * as THREE from "three";
+import { getBrushedMetalTexture } from "./proceduralTextures";
 
 interface MicrowaveCablesProps {
   scrollProgress: number;
@@ -11,35 +12,40 @@ interface MicrowaveCablesProps {
  * MicrowaveCables:
  * Organised cryogenic microwave cabling architecture:
  * - 4 banks of semi-rigid UT-85 gold-jacketed & silver-jacketed coaxial transmission lines
+ * - Thermal contraction stress-relief coils between 4K plate and Still plate
  * - Precision vertical loomed runs passing through stage feedthrough brackets
  * - Centripetal spline interpolation preventing any wild loops or intersecting lines
  * - Cryogenic RF attenuators (-20dB, -10dB, -3dB) with gold SMA connector hardware
  */
 export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps) {
+  const brushedTexture = useMemo(() => getBrushedMetalTexture(), []);
+
   const materials = useMemo(() => {
     return {
       goldCoax: new THREE.MeshStandardMaterial({
         color: "#F3C77C",
         metalness: 0.96,
         roughness: 0.16,
-        envMapIntensity: 2.2,
+        envMapIntensity: 2.3,
       }),
       silverCoax: new THREE.MeshStandardMaterial({
         color: "#CBD5E1",
         metalness: 0.96,
         roughness: 0.15,
-        envMapIntensity: 2.0,
+        envMapIntensity: 2.1,
       }),
       attenuatorBody: new THREE.MeshStandardMaterial({
         color: "#475569",
         metalness: 0.88,
         roughness: 0.3,
-        envMapIntensity: 1.5,
+        bumpMap: brushedTexture,
+        bumpScale: 0.0015,
+        envMapIntensity: 1.6,
       }),
       smaConnector: new THREE.MeshStandardMaterial({
         color: "#D4AF37",
         metalness: 0.96,
-        roughness: 0.2,
+        roughness: 0.18,
       }),
       bracket: new THREE.MeshStandardMaterial({
         color: "#94A3B8",
@@ -50,7 +56,7 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
         color: "#F8FAFC",
       }),
     };
-  }, []);
+  }, [brushedTexture]);
 
   // Stage Y levels matching CoolingStages
   const stageY = [1.5, 0.95, 0.42, -0.12, -0.62, -1.08];
@@ -75,10 +81,22 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
           const x = Math.cos(offsetAng) * r;
           const z = Math.sin(offsetAng) * r;
 
-          // Top of stage
+          // Top of stage feedthrough
           pts.push(new THREE.Vector3(x, y + 0.025, z));
-          // Bottom of stage
+          // Bottom of stage feedthrough
           pts.push(new THREE.Vector3(x, y - 0.025, z));
+
+          // Thermal expansion stress-relief loop between 4K (s=2) and Still stage (s=3)
+          if (s === 2) {
+            const nextY = stageY[s + 1];
+            const coilRadius = r + 0.025;
+            for (let k = 1; k <= 4; k++) {
+              const frac = k / 5;
+              const loopAng = offsetAng + Math.sin(frac * Math.PI) * 0.12 * (c - 1 >= 0 ? 1 : -1);
+              const cy = THREE.MathUtils.lerp(y - 0.06, nextY + 0.06, frac);
+              pts.push(new THREE.Vector3(Math.cos(loopAng) * coilRadius, cy, Math.sin(loopAng) * coilRadius));
+            }
+          }
         }
 
         // Use centripetal Catmull-Rom curve to guarantee NO overshoot looping
@@ -94,7 +112,7 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
   // Pre-allocate TubeGeometries for high performance
   const cableGeometries = useMemo(() => {
     return cableBanks.map((bank) =>
-      bank.map((c) => new THREE.TubeGeometry(c.curve, 32, 0.0075, 8, false))
+      bank.map((c) => new THREE.TubeGeometry(c.curve, 36, 0.0075, 8, false))
     );
   }, [cableBanks]);
 
@@ -157,7 +175,7 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
 
   return (
     <group>
-      {/* 1. Coaxial Transmission Cables */}
+      {/* 1. Coaxial Transmission Cables with Stress-Relief Loops */}
       {cableBanks.map((bank, bIdx) =>
         bank.map((cable, cIdx) => (
           <mesh

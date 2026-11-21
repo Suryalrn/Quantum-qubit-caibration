@@ -2,6 +2,7 @@
 
 import React, { useMemo } from "react";
 import * as THREE from "three";
+import { getBrushedMetalTexture, getWovenBraidTexture } from "./proceduralTextures";
 
 interface CryogenicChamberProps {
   scrollProgress: number;
@@ -11,21 +12,26 @@ interface CryogenicChamberProps {
  * CryogenicChamber:
  * Physically authentic interior cryogenic architecture (Scene 02):
  * - Concentric thermal radiation shielding with architectural cutaways
- * - Polished 304 stainless steel vacuum vessel with vacuum flange & O-ring grooves
+ * - Polished 304 stainless steel vacuum vessel with brushed texture & vacuum flanges
  * - 50K gold/nickel radiation shield with thermal tracer tubes
  * - 4K oxygen-free high conductivity copper inner shield
- * - Flexible braided OFHC copper thermal links (heat straps)
+ * - Flexible woven braided OFHC copper thermal links (heat straps) with stamped gold lugs
  * - Microwave ferrite circulators / isolators with 3-port SMA geometry
  * - Low-noise cryogenic HEMT amplifiers mounted to the 4K cold plate
  * - Cryoperm high-permeability magnetic shield canister housing the QPU
  */
 export default function CryogenicChamber({ scrollProgress }: CryogenicChamberProps) {
+  const brushedTexture = useMemo(() => getBrushedMetalTexture(), []);
+  const braidTexture = useMemo(() => getWovenBraidTexture(), []);
+
   const materials = useMemo(() => {
     return {
       vacuumVessel: new THREE.MeshStandardMaterial({
         color: "#94A3B8",
         metalness: 0.94,
         roughness: 0.22,
+        bumpMap: brushedTexture,
+        bumpScale: 0.002,
         side: THREE.DoubleSide,
         envMapIntensity: 2.0,
       }),
@@ -33,6 +39,8 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         color: "#D97736",
         metalness: 0.94,
         roughness: 0.22,
+        bumpMap: brushedTexture,
+        bumpScale: 0.0018,
         side: THREE.DoubleSide,
         envMapIntensity: 1.8,
       }),
@@ -40,8 +48,19 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         color: "#F3C77C",
         metalness: 0.96,
         roughness: 0.16,
+        bumpMap: brushedTexture,
+        bumpScale: 0.0015,
         side: THREE.DoubleSide,
         envMapIntensity: 2.2,
+      }),
+      braidedCopper: new THREE.MeshStandardMaterial({
+        color: "#D97736",
+        map: braidTexture,
+        metalness: 0.88,
+        roughness: 0.35,
+        bumpMap: braidTexture,
+        bumpScale: 0.004,
+        envMapIntensity: 1.6,
       }),
       goldHardware: new THREE.MeshStandardMaterial({
         color: "#E5B869",
@@ -52,6 +71,8 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         color: "#334155",
         metalness: 0.92,
         roughness: 0.28,
+        bumpMap: brushedTexture,
+        bumpScale: 0.0015,
         side: THREE.DoubleSide,
       }),
       smaPort: new THREE.MeshStandardMaterial({
@@ -65,7 +86,7 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         roughness: 0.18,
       }),
     };
-  }, []);
+  }, [brushedTexture, braidTexture]);
 
   // Shared braided strap geometry
   const strapGeometry = useMemo(() => new THREE.BoxGeometry(0.016, 0.42, 0.06), []);
@@ -133,14 +154,14 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         </mesh>
       </group>
 
-      {/* 5. Braided OFHC Copper Thermal Straps (Flexible heat dissipation links) */}
+      {/* 5. Braided OFHC Copper Thermal Straps (Woven texture heat dissipation links) */}
       {[0, 1, 2, 3, 4, 5].map((idx) => {
         const ang = (idx / 6) * Math.PI * 2;
         const x = Math.cos(ang) * 0.46;
         const z = Math.sin(ang) * 0.46;
         return (
           <group key={`strap-${idx}`} position={[x, -0.85, z]} rotation={[0, ang, 0.22]}>
-            <mesh geometry={strapGeometry} material={materials.copperShield} />
+            <mesh geometry={strapGeometry} material={materials.braidedCopper} />
             {/* Stamped Gold End Lug */}
             <mesh position={[0, 0.21, 0]}>
               <boxGeometry args={[0.024, 0.03, 0.07]} />
@@ -184,7 +205,7 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
         );
       })}
 
-      {/* 7. Cryogenic Low-Noise HEMT Amplifiers with Cooling Fins */}
+      {/* 7. Cryogenic Low-Noise HEMT Amplifiers with Heatsink Cooling Fins */}
       {[0, 1].map((idx) => {
         const ang = idx * Math.PI + 0.9;
         const x = Math.cos(ang) * 0.54;
@@ -197,7 +218,7 @@ export default function CryogenicChamber({ scrollProgress }: CryogenicChamberPro
               <primitive object={materials.goldHardware} attach="material" />
             </mesh>
             {/* Heatsink Cooling Fins */}
-            {[ -0.03, -0.01, 0.01, 0.03 ].map((finOffset, fIdx) => (
+            {[-0.03, -0.01, 0.01, 0.03].map((finOffset, fIdx) => (
               <mesh key={`fin-${fIdx}`} position={[finOffset, 0, 0.028]}>
                 <boxGeometry args={[0.008, 0.11, 0.012]} />
                 <primitive object={materials.copperShield} attach="material" />
