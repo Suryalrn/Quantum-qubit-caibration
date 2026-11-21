@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #141110;
+  --bg-secondary: #1E1917;
+  --bg-card: #26201E;
+  --text-primary: #F4EFE6;
+  --text-secondary: #B8ADA0;
+  --accent-gold: #C6A56B;
+  --accent-amber: #C66B42;
+  --accent-burgundy: #702D3A;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  background-color: #141110;
+  color: #F4EFE6;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Custom warm scientific scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #141110;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E2522;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C6A56B;
+}
+
+/* Warm Glass card utility */
+.glass-panel {
+  background: rgba(38, 32, 30, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(244, 239, 230, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  border-color: rgba(198, 165, 107, 0.35);
+  box-shadow: 0 0 25px -4px rgba(198, 165, 107, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Warm Quantum Lattice background pattern */
+.quantum-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(244, 239, 230, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 239, 230, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}

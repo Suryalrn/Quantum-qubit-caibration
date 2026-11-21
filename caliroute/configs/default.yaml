@@ -1,0 +1,39 @@
+backend:
+  name: "ibm_kingston"
+  num_qubits: 156
+  fallback_to_mock: false
+  token: null
+  channel: "ibm_quantum_platform"
+
+circuits:
+  suite: "mqt_bench"
+  algorithms:
+    - "ghz"
+    - "dj"
+    - "qft"
+    - "graphstate"
+    - "wstate"
+  qubit_tiers:
+    - 5
+    - 8
+    - 12
+  save_qasm: true
+
+sabre:
+  seed_transpiler: 42
+  optimization_level: 1
+  layout_method: "sabre"
+  routing_method: "sabre"
+
+scoring:
+  # Decoherence time model
+  # Gate durations in ns (approx defaults if not present in calibration)
+  default_single_qubit_gate_time_ns: 35.0
+  default_two_qubit_gate_time_ns: 300.0
+  default_measurement_time_ns: 1000.0
+
+paths:
+  raw_calibration_dir: "data/raw/calibration"
+  circuits_dir: "data/circuits"
+  processed_dir: "data/processed"
+  results_dir: "results"
