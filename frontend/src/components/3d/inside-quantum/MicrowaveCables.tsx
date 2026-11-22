@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import { getBrushedMetalTexture } from "./proceduralTextures";
 
 interface MicrowaveCablesProps {
@@ -18,6 +19,8 @@ interface MicrowaveCablesProps {
  * - Cryogenic RF attenuators (-20dB, -10dB, -3dB) with gold SMA connector hardware
  */
 export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps) {
+  const groupRef = useRef<THREE.Group>(null);
+  const currentOpacity = useRef<number>(1.0);
   const brushedTexture = useMemo(() => getBrushedMetalTexture(), []);
 
   const materials = useMemo(() => {
@@ -27,12 +30,16 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
         metalness: 0.96,
         roughness: 0.16,
         envMapIntensity: 2.3,
+        transparent: true,
+        opacity: 1.0,
       }),
       silverCoax: new THREE.MeshStandardMaterial({
         color: "#CBD5E1",
         metalness: 0.96,
         roughness: 0.15,
         envMapIntensity: 2.1,
+        transparent: true,
+        opacity: 1.0,
       }),
       attenuatorBody: new THREE.MeshStandardMaterial({
         color: "#475569",
@@ -41,19 +48,27 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
         bumpMap: brushedTexture,
         bumpScale: 0.0015,
         envMapIntensity: 1.6,
+        transparent: true,
+        opacity: 1.0,
       }),
       smaConnector: new THREE.MeshStandardMaterial({
         color: "#D4AF37",
         metalness: 0.96,
         roughness: 0.18,
+        transparent: true,
+        opacity: 1.0,
       }),
       bracket: new THREE.MeshStandardMaterial({
         color: "#94A3B8",
         metalness: 0.85,
         roughness: 0.35,
+        transparent: true,
+        opacity: 1.0,
       }),
       labelBand: new THREE.MeshBasicMaterial({
         color: "#F8FAFC",
+        transparent: true,
+        opacity: 1.0,
       }),
     };
   }, [brushedTexture]);
@@ -168,13 +183,45 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
     return list;
   }, []);
 
-  // Visible during Scene 1, 2, and in wide network reveal Scene 6
-  // Hidden during macro chip inspection (Scene 3 & 4) and calibration (Scene 5)
-  const isVisible = scrollProgress <= 0.30 || scrollProgress >= 0.84;
-  if (!isVisible) return null;
+  // Smooth frame-by-frame opacity interpolation (no abrupt disappearance)
+  useFrame(() => {
+    const p = scrollProgress;
+    let targetOpacity = 1.0;
+
+    if (p >= 0.28 && p <= 0.74) {
+      if (p < 0.36) {
+        // Fade out smoothly entering Scene 3
+        targetOpacity = 1.0 - (p - 0.28) / 0.08;
+      } else if (p > 0.68) {
+        // Fade back in leaving Scene 4
+        targetOpacity = (p - 0.68) / 0.06;
+      } else {
+        targetOpacity = 0.0;
+      }
+    } else if (p > 0.74 && p < 0.84) {
+      // Fade out for Scene 5 (Calibration Bloch sphere)
+      targetOpacity = 0.0;
+    } else if (p >= 0.84) {
+      targetOpacity = Math.min(1.0, (p - 0.84) / 0.08);
+    }
+
+    currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, targetOpacity, 0.08);
+    const alpha = currentOpacity.current;
+
+    if (groupRef.current) {
+      groupRef.current.visible = alpha > 0.008;
+    }
+
+    materials.goldCoax.opacity = alpha;
+    materials.silverCoax.opacity = alpha;
+    materials.attenuatorBody.opacity = alpha;
+    materials.smaConnector.opacity = alpha;
+    materials.bracket.opacity = alpha;
+    materials.labelBand.opacity = alpha;
+  });
 
   return (
-    <group>
+    <group ref={groupRef}>
       {/* 1. Coaxial Transmission Cables with Stress-Relief Loops */}
       {cableBanks.map((bank, bIdx) =>
         bank.map((cable, cIdx) => (

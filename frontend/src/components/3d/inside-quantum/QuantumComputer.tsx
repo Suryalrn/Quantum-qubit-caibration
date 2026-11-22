@@ -54,8 +54,8 @@ export default function QuantumComputer({ scrollProgress }: QuantumComputerProps
           <cylinderGeometry args={[1.05, 1.05, 0.08, 48]} />
           <primitive object={materials.gantryFlange} attach="material" />
         </mesh>
-        {/* Perimeter Flange Clamp Ring */}
-        <mesh position={[0, 0.045, 0]}>
+        {/* Perimeter Flange Clamp Ring (FLAT horizontal) */}
+        <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.06, 0.012, 12, 48]} />
           <primitive object={materials.gantryFlange} attach="material" />
         </mesh>

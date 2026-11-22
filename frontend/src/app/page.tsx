@@ -221,14 +221,14 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 01 — DILUTION REFRIGERATOR
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[140vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
-          <div className="max-w-xl p-5 sm:p-0 rounded-2xl sm:rounded-none bg-[#06070B]/60 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border border-white/5 sm:border-0">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B0F19]/70 border border-accent-cyan/30 text-xs text-accent-cyan font-mono mb-6 shadow-cyan-glow">
+        <section className="relative min-h-[115vh] pt-28 pb-12 flex flex-col justify-center px-6 md:px-16 lg:px-24">
+          <div className="max-w-xl p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B0F19]/80 border border-accent-cyan/30 text-xs text-accent-cyan font-mono mb-6 shadow-cyan-glow">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
               PHYSICAL QUANTUM COMPUTING PLATFORM
             </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#F8FAFC] leading-[1.05] mb-6 font-display">
+            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#F8FAFC] leading-[1.08] mb-6 font-display">
               BEYOND CLASSICAL.
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-violet to-accent-gold">
@@ -236,7 +236,7 @@ export default function InsideTheQuantumLanding() {
               </span>
             </h1>
 
-            <p className="text-base sm:text-lg text-text-secondary leading-relaxed mb-8 max-w-lg">
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-8 max-w-lg">
               Exploring intelligent, hardware-aware quantum computing. Step inside the dilution refrigerator
               to investigate superconducting transmon qubits, cryogenic microwave waveguides, and noise-adaptive routing.
             </p>
@@ -260,7 +260,7 @@ export default function InsideTheQuantumLanding() {
             </div>
 
             {/* Scroll Indicator */}
-            <div className="mt-14 flex items-center gap-3 text-xs font-mono text-text-muted">
+            <div className="mt-10 flex items-center gap-3 text-xs font-mono text-text-muted">
               <div className="w-5 h-9 rounded-full border border-border-light flex items-start justify-center p-1">
                 <div className="w-1 h-2 bg-accent-cyan rounded-full animate-bounce" />
               </div>
@@ -272,9 +272,9 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 02 — CRYOGENIC CHAMBER
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[140vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
+        <section className="relative min-h-[115vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
           <div className="max-w-lg">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-wider block mb-2">
                 SCENE 02 • CRYOGENIC ARCHITECTURE
               </span>
@@ -304,9 +304,9 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 03 — SUPERCONDUCTING PROCESSOR
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[140vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
+        <section className="relative min-h-[115vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
           <div className="max-w-lg">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
               <span className="text-xs font-mono text-accent-violet uppercase tracking-wider block mb-2">
                 SCENE 03 • SUPERCONDUCTING HARDWARE
               </span>
@@ -335,9 +335,9 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 04 — QUBIT ARCHITECTURE
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[140vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
+        <section className="relative min-h-[115vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
           <div className="max-w-lg">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-wider block mb-2">
                 SCENE 04 • QUBIT TOPOLOGY & COUPLING
               </span>
@@ -376,9 +376,9 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 05 — STATE TOMOGRAPHY AND CALIBRATION
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[140vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
+        <section className="relative min-h-[115vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
           <div className="max-w-lg">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
               <span className="text-xs font-mono text-accent-violet uppercase tracking-wider block mb-2">
                 SCENE 05 • STATE TOMOGRAPHY & CALIBRATION
               </span>
@@ -417,8 +417,8 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 06 — QUANTUM ECOSYSTEM (FINAL REVEAL)
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[110vh] pt-24 pb-16 flex flex-col justify-center items-center text-center px-6 md:px-16 lg:px-24">
-          <div className="max-w-2xl">
+        <section className="relative min-h-[115vh] pt-28 pb-16 flex flex-col justify-center items-center text-center px-6 md:px-16 lg:px-24">
+          <div className="max-w-2xl p-8 sm:p-10 rounded-3xl bg-[#0B0F19]/80 backdrop-blur-xl border border-border-light shadow-card-cryo">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B0F19]/70 border border-accent-cyan/30 text-xs text-accent-cyan font-mono mb-4 shadow-cyan-glow">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
               CONNECTED QUANTUM INTELLIGENCE
