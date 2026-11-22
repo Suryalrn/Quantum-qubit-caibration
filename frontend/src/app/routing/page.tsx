@@ -292,30 +292,34 @@ export default function RoutingSimulatorPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border-light">
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-accent-cyan/10 border border-accent-cyan/30 text-[10px] font-mono text-accent-cyan tracking-wider uppercase mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
+            Noise-Aware Compiler & Circuit Synthesizer
+          </div>
           <h1 className="text-2xl sm:text-3xl font-mono font-bold text-text-primary flex items-center gap-2.5">
-            <GitFork className="w-7 h-7 text-accent-gold" />
+            <GitFork className="w-7 h-7 text-accent-cyan" />
             Noise-Aware Qubit Routing Simulator
           </h1>
-          <p className="text-text-secondary text-xs sm:text-sm mt-1">
+          <p className="text-text-secondary text-xs sm:text-sm">
             GNN-guided beam search initial mapping and noise-adaptive circuit compilation vs. Qiskit SABRE.
           </p>
         </div>
 
         {/* Status indicator */}
-        <div className="flex items-center gap-3">
-          <div className="glass-panel px-3.5 py-1.5 rounded-lg border border-accent-gold/30 text-xs font-mono flex items-center gap-2 text-accent-gold shadow-gold-glow">
-            <Sparkles className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          <div className="glass-panel px-3.5 py-1.5 rounded-xl border border-accent-cyan/30 text-xs font-mono flex items-center gap-2 text-accent-cyan shadow-cyan-glow">
+            <Sparkles className="w-3.5 h-3.5 text-accent-cyan" />
             <span>Dual-Encoder GNN Active</span>
           </div>
         </div>
       </div>
 
       {/* Control Panel & Interactive Form */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-6">
+      <div className="glass-panel p-6 rounded-2xl space-y-6">
         {/* Circuit Mode Switcher Tabs */}
-        <div className="flex flex-wrap border-b border-white/10 gap-2 pb-1">
+        <div className="flex flex-wrap border-b border-border-light gap-2 pb-1">
           <button
             onClick={() => {
               setCircuitMode("preset");
@@ -323,8 +327,8 @@ export default function RoutingSimulatorPage() {
             }}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl font-mono text-xs font-bold transition-all border-b-2 ${
               circuitMode === "preset"
-                ? "bg-[#1E1917] text-accent-gold border-accent-gold shadow-gold-glow"
-                : "text-text-secondary hover:text-white border-transparent hover:bg-white/5"
+                ? "bg-surface-elevated text-accent-cyan border-accent-cyan shadow-cyan-glow"
+                : "text-text-secondary hover:text-white border-transparent hover:bg-white/[0.03]"
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -337,13 +341,13 @@ export default function RoutingSimulatorPage() {
             }}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl font-mono text-xs font-bold transition-all border-b-2 ${
               circuitMode === "custom"
-                ? "bg-[#1E1917] text-accent-gold border-accent-gold shadow-gold-glow"
-                : "text-text-secondary hover:text-white border-transparent hover:bg-white/5"
+                ? "bg-surface-elevated text-accent-gold border-accent-gold shadow-gold-glow"
+                : "text-text-secondary hover:text-white border-transparent hover:bg-white/[0.03]"
             }`}
           >
             <Code2 className="w-4 h-4" />
             <span>Custom OpenQASM 2.0 Studio (Arbitrary Code)</span>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-accent-gold/20 text-accent-gold border border-accent-gold/40">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-accent-gold/15 text-accent-gold border border-accent-gold/30">
               Live Compiler
             </span>
           </button>
@@ -357,13 +361,13 @@ export default function RoutingSimulatorPage() {
               <label className="text-xs font-mono text-text-secondary flex items-center justify-between">
                 <span>TARGET QUANTUM CIRCUIT</span>
                 {selectedCircuit && (
-                  <span className="text-accent-gold font-bold">{selectedCircuit.qubits}Q | Depth {selectedCircuit.depth}</span>
+                  <span className="text-accent-cyan font-bold">{selectedCircuit.qubits}Q | Depth {selectedCircuit.depth}</span>
                 )}
               </label>
               <select
                 value={selectedCircuitId}
                 onChange={(e) => setSelectedCircuitId(e.target.value)}
-                className="w-full bg-[#141110] border border-white/15 rounded-lg px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-gold"
+                className="w-full bg-surface-elevated border border-border-light rounded-xl px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-cyan transition-colors"
               >
                 <optgroup label="5-Qubit Standard Benchmarks">
                   <option value="ghz_5q">Greenberger-Horne-Zeilinger (GHZ 5Q)</option>
@@ -395,7 +399,7 @@ export default function RoutingSimulatorPage() {
               <select
                 value={method}
                 onChange={(e) => setMethod(e.target.value)}
-                className="w-full bg-[#141110] border border-white/15 rounded-lg px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-gold"
+                className="w-full bg-surface-elevated border border-border-light rounded-xl px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-cyan transition-colors"
               >
                 <option value="caliroute_drift_aware">CaliRoute Drift-Aware (Recommended)</option>
                 <option value="caliroute_static">CaliRoute Static Calibration</option>
@@ -407,7 +411,7 @@ export default function RoutingSimulatorPage() {
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-mono text-text-secondary">
                 <span>BEAM SEARCH WIDTH (K)</span>
-                <span className="text-accent-gold font-bold">{beamWidth}</span>
+                <span className="text-accent-cyan font-bold">{beamWidth}</span>
               </div>
               <div className="pt-2">
                 <input
@@ -417,7 +421,7 @@ export default function RoutingSimulatorPage() {
                   step="2"
                   value={beamWidth}
                   onChange={(e) => setBeamWidth(parseInt(e.target.value))}
-                  className="w-full accent-accent-gold cursor-pointer"
+                  className="w-full accent-accent-cyan cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] font-mono text-text-muted mt-1">
                   <span>Fast (k=4)</span>
@@ -431,7 +435,7 @@ export default function RoutingSimulatorPage() {
           /* Custom OpenQASM 2.0 Studio */
           <div className="space-y-4">
             {/* Starter Research Templates Pills */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border-light">
               <div className="space-y-0.5">
                 <div className="text-xs font-mono text-text-primary font-bold flex items-center gap-2">
                   <FileCode className="w-4 h-4 text-accent-gold" />
@@ -447,10 +451,10 @@ export default function RoutingSimulatorPage() {
                   <button
                     key={key}
                     onClick={() => handleTemplateSelect(key)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all border ${
+                    className={`px-3 py-1 rounded-lg text-xs font-mono transition-all border ${
                       selectedTemplate === key
                         ? "bg-accent-gold/20 text-accent-gold border-accent-gold font-bold shadow-gold-glow"
-                        : "bg-[#141110] text-text-secondary border-white/10 hover:text-white"
+                        : "bg-surface-elevated text-text-secondary border-border-light hover:text-white"
                     }`}
                   >
                     {t.name}
@@ -464,7 +468,7 @@ export default function RoutingSimulatorPage() {
               <div className="lg:col-span-2 space-y-2">
                 <div className="flex justify-between items-center text-xs font-mono text-text-secondary">
                   <span className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-accent-gold animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-accent-cyan animate-pulse" />
                     OPENQASM 2.0 SOURCE CODE
                   </span>
                   {(() => {
@@ -472,7 +476,7 @@ export default function RoutingSimulatorPage() {
                     const qCount = match ? match[2] : "?";
                     const gateCount = (customQasm.match(/(cx|cz|h|x|y|z|s|t|rx|ry|rz|u|measure)\s+/gi) || []).length;
                     return (
-                      <span className="text-accent-gold font-bold bg-[#141110] px-2 py-0.5 rounded border border-white/10">
+                      <span className="text-accent-cyan font-bold bg-surface-elevated px-2.5 py-0.5 rounded-md border border-border-light">
                         Detected: {qCount} Qubits | {gateCount} Gates
                       </span>
                     );
@@ -487,12 +491,12 @@ export default function RoutingSimulatorPage() {
                   }}
                   rows={9}
                   spellCheck={false}
-                  className="w-full bg-[#0F0D0C] border border-white/15 rounded-xl p-4 text-xs font-mono text-accent-ivory leading-relaxed focus:outline-none focus:border-accent-gold shadow-inner resize-y select-text"
+                  className="w-full bg-[#030407] border border-border-light rounded-xl p-4 text-xs font-mono text-[#E2E8F0] leading-relaxed focus:outline-none focus:border-accent-cyan transition-colors resize-y select-text shadow-inner"
                   placeholder="// Enter valid OpenQASM 2.0 code..."
                 />
 
                 {qasmError && (
-                  <div className="p-3 rounded-lg bg-status-dead/20 border border-status-dead/40 text-[#D98282] text-xs font-mono flex items-center gap-2">
+                  <div className="p-3 rounded-xl bg-status-critical/15 border border-status-critical/30 text-status-critical text-xs font-mono flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                     <span>{qasmError}</span>
                   </div>
@@ -506,7 +510,7 @@ export default function RoutingSimulatorPage() {
                   <select
                     value={method}
                     onChange={(e) => setMethod(e.target.value)}
-                    className="w-full bg-[#141110] border border-white/15 rounded-lg px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-gold"
+                    className="w-full bg-surface-elevated border border-border-light rounded-xl px-3.5 py-2.5 text-xs font-mono text-text-primary focus:outline-none focus:border-accent-cyan transition-colors"
                   >
                     <option value="caliroute_drift_aware">CaliRoute Drift-Aware (Recommended)</option>
                     <option value="caliroute_static">CaliRoute Static Calibration</option>
@@ -537,7 +541,7 @@ export default function RoutingSimulatorPage() {
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#141110] border border-white/5 text-[11px] font-mono text-text-secondary space-y-1.5">
+                <div className="p-4 rounded-xl bg-surface-elevated/60 border border-border-light text-[11px] font-mono text-text-secondary space-y-1.5">
                   <div className="text-accent-gold font-bold text-xs">Custom Circuit Pipeline:</div>
                   <div>1. Real-time AST gate parsing & DAG generation</div>
                   <div>2. Dead qubit exclusion (Q113, Q121, Q131, Q146)</div>
@@ -550,25 +554,25 @@ export default function RoutingSimulatorPage() {
         )}
 
         {/* Execution Button */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border-light">
           <div className="text-xs font-mono text-text-muted flex items-center gap-2">
-            <Info className="w-4 h-4 text-accent-gold" />
+            <Info className="w-4 h-4 text-accent-cyan" />
             <span>Target Backend: IBM Kingston (156 Physical Qubits, 352 Directed Couplers)</span>
           </div>
 
           <button
             onClick={handleRunOptimization}
             disabled={isRunning}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-accent-amber to-accent-gold text-[#141110] shadow-gold-glow hover:brightness-110 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-accent-cyan via-accent-azure to-accent-gold text-[#06070B] shadow-cyan-glow hover:brightness-110 active:scale-[0.99] transition-all disabled:opacity-50 flex items-center justify-center gap-2.5"
           >
             {isRunning ? (
               <>
-                <div className="w-4 h-4 border-2 border-[#141110] border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[#06070B] border-t-transparent rounded-full animate-spin" />
                 <span>Compiling & Evaluating...</span>
               </>
             ) : (
               <>
-                <Play className="w-4 h-4 fill-[#141110]" />
+                <Play className="w-4 h-4 fill-[#06070B]" />
                 <span>Execute Routing Optimization</span>
               </>
             )}
@@ -577,9 +581,9 @@ export default function RoutingSimulatorPage() {
 
         {/* Live Execution Feedback Badge */}
         {justExecuted && (
-          <div className="flex flex-wrap items-center justify-between p-3 rounded-xl bg-accent-gold/10 border border-accent-gold/30 text-xs font-mono text-accent-gold shadow-gold-glow">
+          <div className="flex flex-wrap items-center justify-between p-3.5 rounded-xl bg-accent-cyan/10 border border-accent-cyan/30 text-xs font-mono text-accent-cyan shadow-cyan-glow">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-accent-gold" />
+              <CheckCircle className="w-4 h-4 text-accent-cyan" />
               <span className="font-bold">
                 Optimization Succeeded in {executionDurationMs} ms • 156Q Layout Refreshed
               </span>
@@ -587,7 +591,7 @@ export default function RoutingSimulatorPage() {
             <div className="text-[10px] text-text-secondary flex items-center gap-2">
               <span>Timestamp: {lastExecutionTime}</span>
               <span className="text-white/20">|</span>
-              <span className="text-accent-amber">0 Faulty Gates</span>
+              <span className="text-accent-gold">0 Faulty Gates</span>
             </div>
           </div>
         )}
@@ -597,34 +601,34 @@ export default function RoutingSimulatorPage() {
           <div className="flex items-center justify-between">
             <button
               onClick={() => setShowLogTerminal(!showLogTerminal)}
-              className="flex items-center gap-2 text-xs font-mono text-text-muted hover:text-accent-gold transition-colors"
+              className="flex items-center gap-2 text-xs font-mono text-text-muted hover:text-accent-cyan transition-colors"
             >
-              <Terminal className="w-3.5 h-3.5 text-accent-gold" />
+              <Terminal className="w-3.5 h-3.5 text-accent-cyan" />
               <span className="font-bold">Compiler Pipeline Execution Trace</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-text-secondary">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-elevated border border-border-light text-text-secondary">
                 {showLogTerminal ? "Hide Console" : "Show Console"}
               </span>
             </button>
             <div className="text-[10px] font-mono text-text-muted flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-gold animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
               <span>GNN Model Active (ρ=0.9115)</span>
             </div>
           </div>
 
           {showLogTerminal && (
-            <div className="p-3.5 rounded-xl bg-[#0F0D0C] border border-white/10 font-mono text-[11px] leading-relaxed max-h-48 overflow-y-auto space-y-1 text-text-secondary select-text">
+            <div className="p-4 rounded-xl bg-[#030407] border border-border-light font-mono text-[11px] leading-relaxed max-h-48 overflow-y-auto space-y-1 text-text-secondary select-text shadow-inner">
               {executionLog.map((line, idx) => (
                 <div
                   key={idx}
                   className={
                     line.includes("[SUCCESS]")
-                      ? "text-accent-gold font-bold"
+                      ? "text-accent-cyan font-bold"
                       : line.includes("[DEFECT") || line.includes("[HARDWARE DEFECT")
-                      ? "text-[#D98282]"
+                      ? "text-status-critical"
                       : line.includes("INITIATING")
-                      ? "text-accent-ivory font-bold"
+                      ? "text-white font-bold"
                       : line.includes("Optimal physical layout")
-                      ? "text-accent-amber font-semibold"
+                      ? "text-accent-gold font-semibold"
                       : "text-text-secondary"
                   }
                 >
@@ -637,10 +641,10 @@ export default function RoutingSimulatorPage() {
       </div>
 
       {/* Catastrophic SABRE Failure Mitigation Banner */}
-      <div className="p-4 rounded-xl border border-status-dead/40 bg-status-dead/15 flex items-start gap-3.5">
-        <AlertTriangle className="w-5 h-5 text-[#D98282] flex-shrink-0 mt-0.5" />
+      <div className="p-5 rounded-2xl border border-status-critical/30 bg-status-critical/10 flex items-start gap-4">
+        <AlertTriangle className="w-5 h-5 text-status-critical flex-shrink-0 mt-0.5" />
         <div className="space-y-1 text-xs">
-          <h4 className="font-mono font-bold text-[#D98282] uppercase tracking-wider">
+          <h4 className="font-mono font-bold text-status-critical uppercase tracking-wider">
             Critical Hardware Safety: Dead Qubit Defect Isolation
           </h4>
           <p className="text-text-secondary leading-relaxed font-sans">
@@ -660,13 +664,13 @@ export default function RoutingSimulatorPage() {
           {/* Metrics Column */}
           <div className="space-y-6">
             {/* Fidelity Comparison Card */}
-            <div className="glass-panel p-5 rounded-2xl border border-accent-gold/30 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="glass-panel p-5 rounded-2xl border border-accent-cyan/30 space-y-4 shadow-card-cryo">
+              <div className="flex items-center justify-between pb-3 border-b border-border-light">
                 <span className="font-mono text-xs font-bold text-text-primary uppercase flex items-center gap-2">
-                  <Gauge className="w-4 h-4 text-accent-gold" />
+                  <Gauge className="w-4 h-4 text-accent-cyan" />
                   Estimated Circuit Fidelity
                 </span>
-                <span className="font-mono text-[10px] text-accent-gold bg-accent-gold/10 px-2 py-0.5 rounded border border-accent-gold/20">
+                <span className="font-mono text-[10px] text-accent-cyan bg-accent-cyan/10 px-2 py-0.5 rounded border border-accent-cyan/20">
                   {routingResult.method.toUpperCase()}
                 </span>
               </div>
@@ -674,7 +678,7 @@ export default function RoutingSimulatorPage() {
               <div className="space-y-3 font-mono">
                 <div>
                   <div className="text-[10px] text-text-muted">CALIROUTE ESTIMATED FIDELITY</div>
-                  <div className="text-3xl font-bold text-accent-gold mt-0.5">
+                  <div className="text-3xl font-bold text-accent-cyan mt-0.5">
                     {(routingResult.caliroute_fidelity * 100).toFixed(2)}%
                   </div>
                   <div className="text-[10px] text-text-secondary">
@@ -682,12 +686,12 @@ export default function RoutingSimulatorPage() {
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-white/10">
+                <div className="pt-2 border-t border-border-light">
                   <div className="text-[10px] text-text-muted">QISKIT SABRE BASELINE FIDELITY</div>
                   <div
                     className={`text-2xl font-bold mt-0.5 ${
                       routingResult.sabre_comparison.sabre_fidelity === 0
-                        ? "text-[#D98282]"
+                        ? "text-status-critical"
                         : "text-text-primary"
                     }`}
                   >
@@ -695,7 +699,7 @@ export default function RoutingSimulatorPage() {
                   </div>
                 </div>
 
-                <div className="p-3 rounded-lg bg-[#141110]/80 border border-white/5 flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-surface-elevated/80 border border-border-light flex items-center justify-between">
                   <span className="text-xs text-text-secondary">Fidelity Advantage:</span>
                   <span className="text-xs font-bold text-accent-gold">
                     {routingResult.sabre_comparison.fidelity_ratio_cr_over_sabre >= 100
@@ -707,33 +711,33 @@ export default function RoutingSimulatorPage() {
             </div>
 
             {/* Hardware Safety & Gate Overhead */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-4 font-mono text-xs">
-              <h4 className="font-bold text-text-primary pb-2 border-b border-white/10 uppercase text-xs">
+            <div className="glass-panel p-5 rounded-2xl space-y-4 font-mono text-xs">
+              <h4 className="font-bold text-text-primary pb-2 border-b border-border-light uppercase text-xs">
                 Compilation Overheads
               </h4>
 
               <div className="space-y-2.5">
-                <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <div className="flex justify-between items-center py-1 border-b border-border-light/50">
                   <span className="text-text-secondary">Faulty / Dead Gates:</span>
                   <span
                     className={`font-bold px-2 py-0.5 rounded text-[11px] ${
                       routingResult.caliroute_faulty_gates === 0
-                        ? "bg-accent-gold/20 text-accent-gold border border-accent-gold/30"
-                        : "bg-status-dead/30 text-[#D98282]"
+                        ? "bg-accent-cyan/15 text-accent-cyan border border-accent-cyan/30"
+                        : "bg-status-critical/15 text-status-critical border border-status-critical/30"
                     }`}
                   >
                     {routingResult.caliroute_faulty_gates} (SABRE: {routingResult.sabre_comparison.sabre_faulty_gates})
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <div className="flex justify-between items-center py-1 border-b border-border-light/50">
                   <span className="text-text-secondary">2-Qubit Gates (CZ):</span>
                   <span className="text-text-primary">
                     {routingResult.caliroute_2q_gates} (SABRE: {routingResult.sabre_comparison.sabre_2q_gates})
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <div className="flex justify-between items-center py-1 border-b border-border-light/50">
                   <span className="text-text-secondary">Compiled Circuit Depth:</span>
                   <span className="text-text-primary">
                     {routingResult.caliroute_depth} (SABRE: {routingResult.sabre_comparison.sabre_depth || "N/A"})
@@ -749,8 +753,8 @@ export default function RoutingSimulatorPage() {
 
             {/* Physics Error Budget & Coherence Card */}
             {routingResult.error_breakdown && (
-              <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 font-mono text-xs shadow-card-warm">
-                <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <div className="glass-panel p-5 rounded-2xl space-y-3 font-mono text-xs shadow-card-cryo">
+                <div className="flex items-center justify-between pb-2 border-b border-border-light">
                   <span className="font-bold text-text-primary uppercase flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-accent-gold" />
                     Physics Error Budget
@@ -768,7 +772,7 @@ export default function RoutingSimulatorPage() {
                         {(routingResult.error_breakdown.p_gate_survival * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-[#141110] rounded-full overflow-hidden border border-white/5">
+                    <div className="w-full h-1.5 bg-[#030407] rounded-full overflow-hidden border border-border-light">
                       <div
                         style={{ width: `${Math.min(100, routingResult.error_breakdown.p_gate_survival * 100)}%` }}
                         className="h-full bg-accent-gold"
@@ -779,14 +783,14 @@ export default function RoutingSimulatorPage() {
                   <div>
                     <div className="flex justify-between text-text-secondary mb-1">
                       <span>Readout Survival (P_readout):</span>
-                      <span className="text-accent-amber font-bold">
+                      <span className="text-accent-cyan font-bold">
                         {(routingResult.error_breakdown.p_readout_survival * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-[#141110] rounded-full overflow-hidden border border-white/5">
+                    <div className="w-full h-1.5 bg-[#030407] rounded-full overflow-hidden border border-border-light">
                       <div
                         style={{ width: `${Math.min(100, routingResult.error_breakdown.p_readout_survival * 100)}%` }}
-                        className="h-full bg-accent-amber"
+                        className="h-full bg-accent-cyan"
                       />
                     </div>
                   </div>
@@ -794,19 +798,19 @@ export default function RoutingSimulatorPage() {
                   <div>
                     <div className="flex justify-between text-text-secondary mb-1">
                       <span>Decoherence Survival (T1/T2):</span>
-                      <span className="text-accent-ivory font-bold">
+                      <span className="text-accent-azure font-bold">
                         {(routingResult.error_breakdown.p_decoherence_survival * 100).toFixed(2)}%
                       </span>
                     </div>
-                    <div className="w-full h-1.5 bg-[#141110] rounded-full overflow-hidden border border-white/5">
+                    <div className="w-full h-1.5 bg-[#030407] rounded-full overflow-hidden border border-border-light">
                       <div
                         style={{ width: `${Math.min(100, routingResult.error_breakdown.p_decoherence_survival * 100)}%` }}
-                        className="h-full bg-accent-ivory"
+                        className="h-full bg-accent-azure"
                       />
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-white/5 flex justify-between items-center text-[10px]">
+                  <div className="pt-2 border-t border-border-light flex justify-between items-center text-[10px]">
                     <span className="text-text-muted">Total Circuit Execution Time:</span>
                     <span className="text-accent-gold font-bold">
                       {routingResult.error_breakdown.makespan_us} µs
@@ -817,8 +821,8 @@ export default function RoutingSimulatorPage() {
             )}
 
             {/* Initial Layout Mapping Table */}
-            <div className="glass-panel p-5 rounded-2xl border border-white/10 space-y-3 font-mono">
-              <h4 className="font-bold text-text-primary pb-2 border-b border-white/10 uppercase text-xs flex items-center justify-between">
+            <div className="glass-panel p-5 rounded-2xl space-y-3 font-mono">
+              <h4 className="font-bold text-text-primary pb-2 border-b border-border-light uppercase text-xs flex items-center justify-between">
                 <span>Initial Layout Map</span>
                 <span className="text-[10px] text-text-muted">Logical → Physical</span>
               </h4>
@@ -827,11 +831,11 @@ export default function RoutingSimulatorPage() {
                 {Object.entries(routingResult.initial_layout).map(([logical, physical]) => (
                   <div
                     key={logical}
-                    className="p-2 rounded-lg bg-[#141110]/80 border border-accent-amber/20 flex items-center justify-between"
+                    className="p-2.5 rounded-xl bg-surface-elevated/80 border border-accent-cyan/20 flex items-center justify-between"
                   >
                     <span className="text-text-muted">q[{logical}]</span>
                     <ArrowRight className="w-3 h-3 text-text-muted" />
-                    <span className="text-accent-amber font-bold">Q{physical}</span>
+                    <span className="text-accent-cyan font-bold">Q{physical}</span>
                   </div>
                 ))}
               </div>
@@ -839,22 +843,22 @@ export default function RoutingSimulatorPage() {
           </div>
 
           {/* 3D Hardware Layout Visualizer */}
-          <div className="lg:col-span-2 glass-panel p-5 rounded-2xl border border-white/10 flex flex-col space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+          <div className="lg:col-span-2 glass-panel p-5 rounded-2xl flex flex-col space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border-light">
               <div>
                 <h3 className="font-mono font-bold text-sm text-text-primary flex items-center gap-2">
-                  <Cpu className="w-4 h-4 text-accent-gold" />
+                  <Cpu className="w-4 h-4 text-accent-cyan" />
                   Physical Processor Mapping (IBM Kingston 156Q)
                 </h3>
                 <p className="text-[11px] text-text-secondary font-mono">
-                  Allocated physical qubits highlighted in warm amber. Hover or click any qubit to inspect telemetry.
+                  Allocated physical qubits highlighted in electric cyan & gold. Hover or click any qubit to inspect telemetry.
                 </p>
               </div>
 
               {/* Selected Qubit Badge & View Toggle */}
               <div className="flex items-center gap-2 self-start sm:self-auto">
                 {selectedQubit && (
-                  <div className="hidden sm:flex items-center gap-2 bg-[#141110] border border-accent-gold/40 px-2.5 py-1 rounded-lg text-xs font-mono text-accent-gold shadow-gold-glow">
+                  <div className="hidden sm:flex items-center gap-2 bg-surface-elevated border border-accent-cyan/40 px-2.5 py-1 rounded-lg text-xs font-mono text-accent-cyan shadow-cyan-glow">
                     <span className="font-bold">Q{selectedQubit.id}</span>
                     <span className="text-white/20">|</span>
                     <span>T₁ {selectedQubit.t1_us} µs</span>
@@ -863,29 +867,29 @@ export default function RoutingSimulatorPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-1 bg-[#141110] p-1 rounded-lg border border-white/10">
-                <button
-                  onClick={() => setViewMode("3d")}
-                  className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
-                    viewMode === "3d" ? "bg-accent-gold/20 text-accent-gold font-bold" : "text-text-secondary hover:text-white"
-                  }`}
-                >
-                  3D View
-                </button>
-                <button
-                  onClick={() => setViewMode("2d")}
-                  className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
-                    viewMode === "2d" ? "bg-accent-gold/20 text-accent-gold font-bold" : "text-text-secondary hover:text-white"
-                  }`}
-                >
-                  2D Grid
-                </button>
+                <div className="flex items-center gap-1 bg-surface-elevated p-1 rounded-lg border border-border-light">
+                  <button
+                    onClick={() => setViewMode("3d")}
+                    className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
+                      viewMode === "3d" ? "bg-accent-cyan/20 text-accent-cyan font-bold" : "text-text-secondary hover:text-white"
+                    }`}
+                  >
+                    3D View
+                  </button>
+                  <button
+                    onClick={() => setViewMode("2d")}
+                    className={`px-3 py-1 rounded text-xs font-mono transition-colors ${
+                      viewMode === "2d" ? "bg-accent-cyan/20 text-accent-cyan font-bold" : "text-text-secondary hover:text-white"
+                    }`}
+                  >
+                    2D Grid
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
 
             {/* 3D Canvas */}
-            <div className="h-[460px] w-full rounded-xl overflow-hidden border border-white/5 relative bg-[#141110]">
+            <div className="h-[460px] w-full rounded-xl overflow-hidden border border-border-light relative bg-[#06070B]">
               {topology ? (
                 <QuantumProcessor3D
                   nodes={topology.nodes}
@@ -907,8 +911,8 @@ export default function RoutingSimulatorPage() {
       )}
 
       {/* 15-Circuit Comparative Benchmark Suite */}
-      <div className="glass-panel p-6 rounded-2xl border border-white/10 space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="glass-panel p-6 rounded-2xl space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border-light">
           <div>
             <h3 className="font-mono font-bold text-base text-text-primary flex items-center gap-2">
               <Layers className="w-5 h-5 text-accent-gold" />
@@ -921,7 +925,7 @@ export default function RoutingSimulatorPage() {
 
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#141110] border border-white/15 text-xs font-mono text-accent-gold hover:bg-white/5 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-elevated border border-border-light text-xs font-mono text-accent-cyan hover:border-accent-cyan/40 transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export Benchmark (CSV)</span>
@@ -932,29 +936,29 @@ export default function RoutingSimulatorPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
             <thead>
-              <tr className="border-b border-white/10 text-text-muted text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-border-light text-text-muted text-[11px] uppercase tracking-wider">
                 <th className="py-2.5 px-3">Circuit ID</th>
                 <th className="py-2.5 px-3 text-center">Qubits</th>
                 <th className="py-2.5 px-3 text-right">Qiskit SABRE Fidelity</th>
                 <th className="py-2.5 px-3 text-right">CaliRoute Static</th>
-                <th className="py-2.5 px-3 text-right text-accent-gold">CaliRoute Drift-Aware</th>
+                <th className="py-2.5 px-3 text-right text-accent-cyan">CaliRoute Drift-Aware</th>
                 <th className="py-2.5 px-3 text-center">Fidelity Ratio (CR / SABRE)</th>
                 <th className="py-2.5 px-3 text-center">Dead Qubit Defect Avoided</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border-light/50">
               {benchmarkRecords.map((rec) => {
                 const isSabreCatastrophic = rec.sabre_fidelity === 0.0;
                 return (
-                  <tr key={rec.circuit_id} className="hover:bg-white/5 transition-colors">
+                  <tr key={rec.circuit_id} className="hover:bg-white/[0.03] transition-colors">
                     <td className="py-3 px-3 font-bold text-text-primary flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-accent-gold" />
+                      <span className="w-2 h-2 rounded-full bg-accent-cyan" />
                       {rec.circuit_id}
                     </td>
                     <td className="py-3 px-3 text-center text-text-secondary">{rec.num_qubits}</td>
                     <td className="py-3 px-3 text-right">
                       {isSabreCatastrophic ? (
-                        <span className="text-[#D98282] font-bold bg-status-dead/30 px-2 py-0.5 rounded border border-status-dead/40">
+                        <span className="text-status-critical font-bold bg-status-critical/15 px-2.5 py-0.5 rounded border border-status-critical/30">
                           0.0000 (Failed)
                         </span>
                       ) : (
@@ -964,15 +968,15 @@ export default function RoutingSimulatorPage() {
                     <td className="py-3 px-3 text-right text-text-secondary">
                       {(rec.caliroute_static_fidelity * 100).toFixed(2)}%
                     </td>
-                    <td className="py-3 px-3 text-right font-bold text-accent-gold">
+                    <td className="py-3 px-3 text-right font-bold text-accent-cyan">
                       {(rec.caliroute_drift_aware_fidelity * 100).toFixed(2)}%
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span
-                        className={`font-bold px-2 py-0.5 rounded ${
+                        className={`font-bold px-2.5 py-0.5 rounded border ${
                           rec.fidelity_ratio_drift_over_sabre >= 1.0
-                            ? "text-accent-gold bg-accent-gold/15 border border-accent-gold/25"
-                            : "text-accent-amber bg-accent-amber/15 border border-accent-amber/25"
+                            ? "text-accent-gold bg-accent-gold/15 border-accent-gold/30 shadow-[0_0_10px_rgba(229,192,123,0.12)]"
+                            : "text-accent-cyan bg-accent-cyan/15 border-accent-cyan/30"
                         }`}
                       >
                         {rec.fidelity_ratio_drift_over_sabre >= 100

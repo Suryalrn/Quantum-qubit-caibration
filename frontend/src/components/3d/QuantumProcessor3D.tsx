@@ -16,16 +16,17 @@ interface QuantumProcessor3DProps {
   mode?: "3d" | "2d";
 }
 
-// Warm Luxury Color Palette (Replacing prohibited colors)
+// Precision Quantum & Neural AI Color Palette
 const PALETTE = {
-  optimal: "#C6A56B",    // Champagne Gold
-  warning: "#D9944A",    // Warm Amber
-  critical: "#943846",   // Deep Terracotta
-  dead: "#702D3A",       // Rich Wine Burgundy
-  selected: "#F4EFE6",   // Warm Ivory
-  mapped: "#C66B42",     // Burnt Orange
-  coupler: "#4A3B32",    // Warm Antique Bronze Wire
-  couplerBroken: "#702D3A",
+  optimal: "#E5C07B",       // Superconducting Cryogenic Gold
+  optimalGlow: "#00F0FF",   // Quantum Coherence Cyan
+  warning: "#F59E0B",       // Parameter Drift Amber
+  critical: "#F43F5E",      // High Noise Rose
+  dead: "#EF4444",          // Physical Laser Defect Red
+  selected: "#00F0FF",      // Quantum Coherent Halo Cyan
+  mapped: "#38BDF8",        // Active Circuit Neural Waveguide
+  coupler: "#1E293B",       // Superconducting Niobium Bus
+  couplerBroken: "#EF4444",
 };
 
 // Qubit sphere color logic based on real telemetry
@@ -99,8 +100,8 @@ function QubitSphere({
       {(isSelected || isMapped || node.id === 0 || node.id === 67 || node.status === "dead") && (
         <Html position={[0, 0.45, 0]} center distanceFactor={18}>
           <div
-            className="font-mono text-[9px] font-bold px-1 py-0.5 rounded pointer-events-none select-none whitespace-nowrap bg-[#141110]/80 border border-white/10"
-            style={{ color: isSelected ? PALETTE.selected : (node.status === "dead" ? "#D98282" : isMapped ? PALETTE.mapped : PALETTE.optimal) }}
+            className="font-mono text-[9px] font-bold px-1 py-0.5 rounded pointer-events-none select-none whitespace-nowrap bg-[#06070B]/90 border border-white/20 shadow-card-cryo"
+            style={{ color: isSelected ? PALETTE.selected : (node.status === "dead" ? "#EF4444" : isMapped ? PALETTE.mapped : PALETTE.optimal) }}
           >
             {`Q${node.id}`}
           </div>
@@ -181,15 +182,15 @@ export default function QuantumProcessor3D({
   const is2D = mode === "2d";
 
   return (
-    <div className="relative w-full h-full bg-[#141110] rounded-xl overflow-hidden border border-white/10 select-none">
+    <div className="relative w-full h-full bg-[#06070B] rounded-xl overflow-hidden border border-white/[0.08] select-none shadow-card-cryo">
       <Canvas
         camera={{ position: [0, 0, is2D ? 20 : 22], fov: 48 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <ambientLight intensity={0.5} color="#F4EFE6" />
-        <pointLight position={[10, 10, 15]} intensity={1.2} color={PALETTE.optimal} />
-        <pointLight position={[-10, -10, 15]} intensity={0.8} color={PALETTE.mapped} />
-        <directionalLight position={[0, 15, 10]} intensity={0.6} color="#FFE6CC" />
+        <ambientLight intensity={0.4} color="#0B132B" />
+        <pointLight position={[10, 10, 15]} intensity={1.5} color="#00F0FF" />
+        <pointLight position={[-10, -10, 15]} intensity={1.2} color="#E5C07B" />
+        <directionalLight position={[0, 15, 10]} intensity={0.7} color="#F8FAFC" />
 
         <OrbitControls
           enableRotate={!is2D}
@@ -222,12 +223,12 @@ export default function QuantumProcessor3D({
 
       {/* Floating Hover HUD */}
       {hoveredQubit && (
-        <div className="absolute bottom-5 left-5 pointer-events-none glass-panel p-3.5 rounded-lg border border-accent-gold/40 shadow-gold-glow text-xs z-20 max-w-xs animate-fadeIn">
+        <div className="absolute bottom-5 left-5 pointer-events-none glass-panel p-3.5 rounded-lg border border-accent-cyan/40 shadow-cyan-glow text-xs z-20 max-w-xs animate-fadeIn">
           <div className="flex items-center justify-between pb-1.5 border-b border-white/10 mb-2">
-            <span className="font-mono font-bold text-accent-gold text-sm">{hoveredQubit.label}</span>
+            <span className="font-mono font-bold text-accent-cyan text-sm">{hoveredQubit.label}</span>
             <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-semibold ${
-              hoveredQubit.status === "dead" ? "bg-status-dead/30 text-[#D98282]" :
-              hoveredQubit.error_tier === "warning" ? "bg-status-warning/20 text-status-warning" : "bg-status-optimal/20 text-status-optimal"
+              hoveredQubit.status === "dead" ? "bg-red-500/20 text-red-400 border border-red-500/30" :
+              hoveredQubit.error_tier === "warning" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-cyan-500/20 text-accent-cyan border border-cyan-500/30"
             }`}>
               {hoveredQubit.status}
             </span>
@@ -247,21 +248,21 @@ export default function QuantumProcessor3D({
 
       {/* Controls & Legend Overlay */}
       <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-        <div className="glass-panel px-3 py-2 rounded-lg text-[11px] flex items-center gap-3 border border-white/10">
+        <div className="glass-panel px-3 py-2 rounded-lg text-[11px] flex items-center gap-3 border border-white/[0.08] shadow-card-cryo">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-status-optimal"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-[#E5C07B] shadow-[0_0_8px_#E5C07B]"></span>
             <span className="text-text-secondary">Optimal (Gold)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-status-warning"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-status-warning shadow-[0_0_8px_#F59E0B]"></span>
             <span className="text-text-secondary">Degraded</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-status-dead animate-pulse"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-status-dead animate-pulse shadow-[0_0_8px_#EF4444]"></span>
             <span className="text-text-secondary">Dead (Q146)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-accent-ivory"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-accent-cyan shadow-[0_0_8px_#00F0FF]"></span>
             <span className="text-text-secondary">Selected</span>
           </div>
         </div>
