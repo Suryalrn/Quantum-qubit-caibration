@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Cpu, Search, Filter, ShieldAlert, Info, Layers } from "lucide-react";
+import { Cpu, Search, Filter, ShieldAlert, Info, Layers, Network, Activity } from "lucide-react";
 import QuantumProcessor3D from "@/components/3d/QuantumProcessor3D";
 import { getBackends, getTopology } from "@/lib/api";
 import { BackendMetadata, TopologyData, QubitNode } from "@/types/quantum";
@@ -270,6 +270,65 @@ export default function HardwareExplorerPage() {
                 </span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Physical Hardware Architecture Guide */}
+      <div className="glass-panel p-5 rounded-xl border border-white/10 space-y-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2.5 border-b border-white/10 gap-2">
+          <div className="font-mono font-bold text-xs sm:text-sm text-text-primary flex items-center gap-2">
+            <Layers className="w-4 h-4 text-accent-gold" />
+            <span>Physical QPU Architecture — Reading the Hardware Chip</span>
+          </div>
+          <span className="font-mono text-[11px] text-text-muted">
+            High-Resistivity Silicon • Dilution Cryostat 15 mK
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
+          {/* Card 1: Spheres / Transmons */}
+          <div className="p-3.5 rounded-lg bg-[#141110]/70 border border-white/5 space-y-1.5 hover:border-accent-gold/30 transition-colors">
+            <div className="flex items-center gap-2 text-accent-gold font-bold">
+              <span className="w-2.5 h-2.5 rounded-full bg-accent-gold shadow-gold-glow"></span>
+              <span>Spheres = Transmon Qubits</span>
+            </div>
+            <p className="text-text-secondary text-[11px] leading-relaxed">
+              Superconducting niobium capacitor pads coupled to a sub-micron Al/AlOₓ Josephson junction operating at 15 mK near absolute zero.
+            </p>
+          </div>
+
+          {/* Card 2: Edges / Couplers */}
+          <div className="p-3.5 rounded-lg bg-[#141110]/70 border border-white/5 space-y-1.5 hover:border-accent-gold/30 transition-colors">
+            <div className="flex items-center gap-2 text-[#E0B87A] font-bold">
+              <Network className="w-3.5 h-3.5 text-accent-gold" />
+              <span>Lines = Microwave Couplers</span>
+            </div>
+            <p className="text-text-secondary text-[11px] leading-relaxed">
+              Coplanar waveguide (CPW) microwave resonators enabling native 2-qubit entangling gates ({selectedBackend.native_2q_gate?.toUpperCase() || "CZ"}) between physically adjacent qubits.
+            </p>
+          </div>
+
+          {/* Card 3: Heavy-Hex */}
+          <div className="p-3.5 rounded-lg bg-[#141110]/70 border border-white/5 space-y-1.5 hover:border-accent-gold/30 transition-colors">
+            <div className="flex items-center gap-2 text-text-primary font-bold">
+              <Layers className="w-3.5 h-3.5 text-accent-gold" />
+              <span>Heavy-Hexagonal Layout</span>
+            </div>
+            <p className="text-text-secondary text-[11px] leading-relaxed">
+              Sparse honeycomb connectivity (degree 2–3) suppresses microwave frequency collisions and crosstalk while maintaining surface-code error correction.
+            </p>
+          </div>
+
+          {/* Card 4: Colors & Defects */}
+          <div className="p-3.5 rounded-lg bg-[#141110]/70 border border-white/5 space-y-1.5 hover:border-accent-gold/30 transition-colors">
+            <div className="flex items-center gap-2 text-text-primary font-bold">
+              <Activity className="w-3.5 h-3.5 text-status-warning" />
+              <span>Telemetry Health Tiers</span>
+            </div>
+            <p className="text-text-secondary text-[11px] leading-relaxed">
+              Gold = High coherence (T₁ &gt; 200 µs), Amber = Degraded readout, Wine Burgundy = Defective dead line automatically isolated by CaliRoute.
+            </p>
           </div>
         </div>
       </div>
