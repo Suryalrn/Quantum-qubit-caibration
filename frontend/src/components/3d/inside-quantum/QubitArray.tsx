@@ -132,8 +132,8 @@ export default function QubitArray({ scrollProgress }: QubitArrayProps) {
     };
   }, []);
 
-  // Visible during Scene 4, and in wide network reveal Scene 6 (hidden during scene 5 calibration)
-  const isVisible = (scrollProgress >= 0.45 && scrollProgress <= 0.72) || scrollProgress >= 0.88;
+  // Visible during Scene 3 (chip inspection) and Scene 6 (wide network reveal)
+  const isVisible = (scrollProgress >= 0.32 && scrollProgress <= 0.52) || scrollProgress >= 0.88;
   if (!isVisible) return null;
 
   return (

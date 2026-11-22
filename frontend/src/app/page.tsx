@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Lenis from "lenis";
 import InsideQuantumCanvas from "@/components/3d/inside-quantum/InsideQuantumCanvas";
+import ScientificHUD from "@/components/3d/inside-quantum/ScientificHUD";
 import { getTopology, getAnalytics, getModelsStatus } from "@/lib/api";
 import { AnalyticsData, ModelsStatus } from "@/types/quantum";
 
@@ -32,8 +33,8 @@ import { AnalyticsData, ModelsStatus } from "@/types/quantum";
 const SCENE_STAGES = [
   { id: 1, label: "I • CHANDELIER", name: "Dilution Refrigerator", target: 0.0 },
   { id: 2, label: "II • CRYOSTAT", name: "Cryogenic Chamber", target: 0.20 },
-  { id: 3, label: "III • PROCESSOR", name: "Superconducting Chip", target: 0.42 },
-  { id: 4, label: "IV • TOPOLOGY", name: "Qubit Architecture", target: 0.62 },
+  { id: 3, label: "III • PROCESSOR", name: "Superconducting Chip", target: 0.40 },
+  { id: 4, label: "IV • DOLAN BRIDGE", name: "Josephson Junction", target: 0.60 },
   { id: 5, label: "V • CALIBRATION", name: "State Tomography", target: 0.80 },
   { id: 6, label: "VI • ECOSYSTEM", name: "Quantum Network", target: 1.0 },
 ];
@@ -67,10 +68,10 @@ export default function InsideTheQuantumLanding() {
       setScrollProgress(progress);
 
       if (progress < 0.16) setActiveSceneIndex(0);
-      else if (progress < 0.36) setActiveSceneIndex(1);
-      else if (progress < 0.54) setActiveSceneIndex(2);
-      else if (progress < 0.72) setActiveSceneIndex(3);
-      else if (progress < 0.88) setActiveSceneIndex(4);
+      else if (progress < 0.34) setActiveSceneIndex(1);
+      else if (progress < 0.52) setActiveSceneIndex(2);
+      else if (progress < 0.70) setActiveSceneIndex(3);
+      else if (progress < 0.86) setActiveSceneIndex(4);
       else setActiveSceneIndex(5);
     };
 
@@ -104,6 +105,9 @@ export default function InsideTheQuantumLanding() {
       >
         <InsideQuantumCanvas scrollProgress={scrollProgress} interactive={orbitMode} />
       </div>
+
+      {/* Real-time Scientific Telemetry HUD & Nanoscale Metrics */}
+      <ScientificHUD scrollProgress={scrollProgress} />
 
       {/* Atmospheric Vignette Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-radial-gradient from-transparent via-[#06070B]/30 to-[#06070B]/85" />
@@ -333,30 +337,31 @@ export default function InsideTheQuantumLanding() {
         </section>
 
         {/* -------------------------------------------------------------------
-            SCENE 04 — QUBIT ARCHITECTURE
+            SCENE 04 — JOSEPHSON JUNCTION (MICROSCOPIC HERO SHOT)
             ------------------------------------------------------------------- */}
         <section className="relative min-h-[115vh] flex flex-col justify-center px-6 md:px-16 lg:px-24">
           <div className="max-w-lg">
             <div className="p-6 sm:p-8 rounded-2xl bg-[#0B0F19]/70 backdrop-blur-xl border border-border-light shadow-card-cryo">
               <span className="text-xs font-mono text-accent-cyan uppercase tracking-wider block mb-2">
-                SCENE 04 • QUBIT TOPOLOGY & COUPLING
+                SCENE 04 • DOLAN BRIDGE HERO SHOT (50,000×)
               </span>
               <h2 className="text-3xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight mb-4">
-                Every Connection Matters.
+                The Non-Linear Heart.
               </h2>
               <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-6">
-                Understanding the architecture of quantum hardware. Transmon qubits interact through fixed-frequency
-                bus resonators. Our dual-encoder GNN steers logical 2-qubit gates away from defective couplers and noisy corridors.
+                A transmon is an LC circuit made non-linear by substituting a geometric inductor with a Josephson junction.
+                Fabricated via electron-beam lithography and shadow evaporation, two superconducting aluminum electrodes
+                tunnel across an amorphous 1.5nm AlOₓ barrier. Non-linear inductance isolates the computational |0⟩–|1⟩ subspace.
               </p>
 
               <div className="grid grid-cols-2 gap-3 pt-4 border-t border-border-light text-xs font-mono">
                 <div>
-                  <span className="text-text-muted block text-[10px]">LATTICE TOPOLOGY</span>
-                  <span className="text-sm font-semibold text-accent-cyan">Heavy-Hexagonal</span>
+                  <span className="text-text-muted block text-[10px]">BARRIER THICKNESS</span>
+                  <span className="text-sm font-semibold text-accent-cyan">~1.5 nm Amorphous AlOₓ</span>
                 </div>
                 <div>
-                  <span className="text-text-muted block text-[10px]">ROUTING POLICY</span>
-                  <span className="text-sm font-semibold text-accent-violet">Dual-Encoder GNN</span>
+                  <span className="text-text-muted block text-[10px]">JOSEPHSON INDUCTANCE</span>
+                  <span className="text-sm font-semibold text-accent-gold">L_J ≈ 9.3 nH (α = -224 MHz)</span>
                 </div>
               </div>
 

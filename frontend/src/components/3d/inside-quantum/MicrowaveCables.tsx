@@ -11,12 +11,12 @@ interface MicrowaveCablesProps {
 
 /**
  * MicrowaveCables:
- * Organised cryogenic microwave cabling architecture:
- * - 4 banks of semi-rigid UT-85 gold-jacketed & silver-jacketed coaxial transmission lines
- * - Thermal contraction stress-relief coils between 4K plate and Still plate
- * - Precision vertical loomed runs passing through stage feedthrough brackets
- * - Centripetal spline interpolation preventing any wild loops or intersecting lines
- * - Cryogenic RF attenuators (-20dB, -10dB, -3dB) with gold SMA connector hardware
+ * Scientifically authentic cryogenic microwave cabling assembly:
+ * - 4 azimuthal banks of semi-rigid UT-085 gold/silver jacketed coaxial transmission lines
+ * - Precision vertical stepped loomed runs through stage bulkhead feedthroughs
+ * - Compact, tightly coiled helical strain-relief loops between 4K and Still stages
+ * - No wild overshoots or unconstrained spline ballooning
+ * - Cryogenic RF attenuators (-20dB, -10dB, -3dB) with brass SMA connector hardware
  */
 export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps) {
   const groupRef = useRef<THREE.Group>(null);
@@ -26,10 +26,10 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
   const materials = useMemo(() => {
     return {
       goldCoax: new THREE.MeshStandardMaterial({
-        color: "#F3C77C",
+        color: "#E5B869",
         metalness: 0.96,
         roughness: 0.16,
-        envMapIntensity: 2.3,
+        envMapIntensity: 2.2,
         transparent: true,
         opacity: 1.0,
       }),
@@ -37,7 +37,7 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
         color: "#CBD5E1",
         metalness: 0.96,
         roughness: 0.15,
-        envMapIntensity: 2.1,
+        envMapIntensity: 2.0,
         transparent: true,
         opacity: 1.0,
       }),
@@ -58,13 +58,6 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
         transparent: true,
         opacity: 1.0,
       }),
-      bracket: new THREE.MeshStandardMaterial({
-        color: "#94A3B8",
-        metalness: 0.85,
-        roughness: 0.35,
-        transparent: true,
-        opacity: 1.0,
-      }),
       labelBand: new THREE.MeshBasicMaterial({
         color: "#F8FAFC",
         transparent: true,
@@ -74,85 +67,85 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
   }, [brushedTexture]);
 
   // Stage Y levels matching CoolingStages
-  const stageY = [1.5, 0.95, 0.42, -0.12, -0.62, -1.08];
+  const stageY = useMemo(() => [1.5, 0.95, 0.42, -0.12, -0.62, -1.08], []);
 
-  // 4 banks of 3 coaxial cables distributed azimuthally
-  const cableBanks = useMemo(() => {
-    const banks = [];
-    const bankAngles = [0.2, Math.PI * 0.5 + 0.2, Math.PI + 0.2, Math.PI * 1.5 + 0.2];
+  // Generate 4 loomed banks of 3 semi-rigid coaxial cables
+  const { cableCurves, isGoldFlags } = useMemo(() => {
+    const curves: THREE.CatmullRomCurve3[] = [];
+    const goldFlags: boolean[] = [];
+    const bankAngles = [0.35, Math.PI * 0.5 + 0.35, Math.PI + 0.35, Math.PI * 1.5 + 0.35];
 
-    for (let b = 0; b < bankAngles.length; b++) {
-      const baseAng = bankAngles[b];
-      const cablesInBank = [];
-
+    bankAngles.forEach((baseAng, bIdx) => {
       for (let c = 0; c < 3; c++) {
-        const offsetAng = baseAng + (c - 1) * 0.07;
+        const offsetAng = baseAng + (c - 1) * 0.055;
         const pts: THREE.Vector3[] = [];
 
-        // Generate clean vertical stepped runs that step inward with each stage
         for (let s = 0; s < stageY.length; s++) {
           const y = stageY[s];
-          const r = THREE.MathUtils.lerp(0.66, 0.32, s / (stageY.length - 1)) + c * 0.02;
+          // Progressive inward taper matching conical stage profile
+          const r = THREE.MathUtils.lerp(0.64, 0.30, s / (stageY.length - 1)) + (c - 1) * 0.022;
           const x = Math.cos(offsetAng) * r;
           const z = Math.sin(offsetAng) * r;
 
-          // Top of stage feedthrough
-          pts.push(new THREE.Vector3(x, y + 0.025, z));
-          // Bottom of stage feedthrough
-          pts.push(new THREE.Vector3(x, y - 0.025, z));
+          // Point above stage plate
+          pts.push(new THREE.Vector3(x, y + 0.03, z));
+          // Point below stage plate
+          pts.push(new THREE.Vector3(x, y - 0.03, z));
 
-          // Thermal expansion stress-relief loop between 4K (s=2) and Still stage (s=3)
+          // Controlled compact helical strain-relief coil between 4K (s=2) and Still (s=3)
           if (s === 2) {
             const nextY = stageY[s + 1];
-            const coilRadius = r + 0.025;
-            for (let k = 1; k <= 4; k++) {
-              const frac = k / 5;
-              const loopAng = offsetAng + Math.sin(frac * Math.PI) * 0.12 * (c - 1 >= 0 ? 1 : -1);
-              const cy = THREE.MathUtils.lerp(y - 0.06, nextY + 0.06, frac);
-              pts.push(new THREE.Vector3(Math.cos(loopAng) * coilRadius, cy, Math.sin(loopAng) * coilRadius));
+            const coilSteps = 6;
+            for (let k = 1; k < coilSteps; k++) {
+              const frac = k / coilSteps;
+              const loopPhase = frac * Math.PI * 2;
+              // Small radius helical loop (~2cm) strictly confined
+              const dRadius = Math.sin(loopPhase) * 0.025;
+              const dTang = Math.cos(loopPhase) * 0.022;
+              const curR = r + dRadius;
+              const curAng = offsetAng + dTang;
+              const curY = THREE.MathUtils.lerp(y - 0.08, nextY + 0.08, frac);
+              pts.push(new THREE.Vector3(Math.cos(curAng) * curR, curY, Math.sin(curAng) * curR));
             }
           }
         }
 
-        // Use centripetal Catmull-Rom curve to guarantee NO overshoot looping
-        const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal");
-        cablesInBank.push({ curve, isGold: (b + c) % 2 === 0 });
+        // Centripetal Catmull-Rom prevents overshoot oscillations
+        const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal", 0.5);
+        curves.push(curve);
+        goldFlags.push((bIdx + c) % 2 === 0);
       }
+    });
 
-      banks.push(cablesInBank);
-    }
-    return banks;
-  }, []);
+    return { cableCurves: curves, isGoldFlags: goldFlags };
+  }, [stageY]);
 
-  // Pre-allocate TubeGeometries for high performance
+  // Pre-allocate TubeGeometries
   const cableGeometries = useMemo(() => {
-    return cableBanks.map((bank) =>
-      bank.map((c) => new THREE.TubeGeometry(c.curve, 36, 0.0075, 8, false))
-    );
-  }, [cableBanks]);
+    return cableCurves.map((curve) => new THREE.TubeGeometry(curve, 48, 0.0065, 8, false));
+  }, [cableCurves]);
 
-  // Clean GPU geometries on unmount
   React.useEffect(() => {
     return () => {
-      cableGeometries.forEach((bank) => bank.forEach((g) => g.dispose()));
+      cableGeometries.forEach((g) => g.dispose());
     };
   }, [cableGeometries]);
 
   // Attenuators mounted underneath stages
   const attenuators = useMemo(() => {
     const list: { pos: [number, number, number]; rot: [number, number, number] }[] = [];
-    const attConfigs = [
-      { y: 0.95 },
-      { y: 0.42 },
-      { y: -0.12 },
-      { y: -0.62 },
+    const attStages = [
+      { y: 0.95, label: "-20dB" },
+      { y: 0.42, label: "-20dB" },
+      { y: -0.12, label: "-10dB" },
+      { y: -0.62, label: "-3dB" },
     ];
 
-    attConfigs.forEach(({ y }, sIdx) => {
-      const r = THREE.MathUtils.lerp(0.64, 0.34, sIdx / 3);
+    attStages.forEach(({ y }, sIdx) => {
+      const r = THREE.MathUtils.lerp(0.62, 0.32, sIdx / 3);
       const count = 4;
       for (let i = 0; i < count; i++) {
-        const ang = (i / count) * Math.PI * 2 + sIdx * 0.5 + 0.2;
+        const ang = (i / count) * Math.PI * 2 + sIdx * 0.4 + 0.35;
         const x = Math.cos(ang) * r;
         const z = Math.sin(ang) * r;
         list.push({
@@ -165,44 +158,41 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
     return list;
   }, []);
 
-  // SMA Feedthrough bulkhead nuts on each stage
+  // SMA Bulkhead nuts on each stage plate
   const feedthroughs = useMemo(() => {
     const list: [number, number, number][] = [];
-    const bankAngles = [0.2, Math.PI * 0.5 + 0.2, Math.PI + 0.2, Math.PI * 1.5 + 0.2];
+    const bankAngles = [0.35, Math.PI * 0.5 + 0.35, Math.PI + 0.35, Math.PI * 1.5 + 0.35];
 
     stageY.forEach((y, sIdx) => {
       bankAngles.forEach((baseAng) => {
         for (let c = 0; c < 3; c++) {
-          const offsetAng = baseAng + (c - 1) * 0.07;
-          const r = THREE.MathUtils.lerp(0.66, 0.32, sIdx / (stageY.length - 1)) + c * 0.02;
+          const offsetAng = baseAng + (c - 1) * 0.055;
+          const r = THREE.MathUtils.lerp(0.64, 0.30, sIdx / (stageY.length - 1)) + (c - 1) * 0.022;
           list.push([Math.cos(offsetAng) * r, y, Math.sin(offsetAng) * r]);
         }
       });
     });
 
     return list;
-  }, []);
+  }, [stageY]);
 
-  // Smooth frame-by-frame opacity interpolation (no abrupt disappearance)
+  // Smooth frame-by-frame opacity interpolation
   useFrame(() => {
     const p = scrollProgress;
     let targetOpacity = 1.0;
 
-    if (p >= 0.28 && p <= 0.74) {
-      if (p < 0.36) {
-        // Fade out smoothly entering Scene 3
-        targetOpacity = 1.0 - (p - 0.28) / 0.08;
-      } else if (p > 0.68) {
-        // Fade back in leaving Scene 4
-        targetOpacity = (p - 0.68) / 0.06;
+    if (p >= 0.30 && p <= 0.72) {
+      if (p < 0.38) {
+        targetOpacity = 1.0 - (p - 0.30) / 0.08;
+      } else if (p > 0.64) {
+        targetOpacity = (p - 0.64) / 0.08;
       } else {
         targetOpacity = 0.0;
       }
-    } else if (p > 0.74 && p < 0.84) {
-      // Fade out for Scene 5 (Calibration Bloch sphere)
+    } else if (p > 0.72 && p < 0.86) {
       targetOpacity = 0.0;
-    } else if (p >= 0.84) {
-      targetOpacity = Math.min(1.0, (p - 0.84) / 0.08);
+    } else if (p >= 0.86) {
+      targetOpacity = Math.min(1.0, (p - 0.86) / 0.08);
     }
 
     currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, targetOpacity, 0.08);
@@ -216,57 +206,54 @@ export default function MicrowaveCables({ scrollProgress }: MicrowaveCablesProps
     materials.silverCoax.opacity = alpha;
     materials.attenuatorBody.opacity = alpha;
     materials.smaConnector.opacity = alpha;
-    materials.bracket.opacity = alpha;
     materials.labelBand.opacity = alpha;
   });
 
   return (
     <group ref={groupRef}>
-      {/* 1. Coaxial Transmission Cables with Stress-Relief Loops */}
-      {cableBanks.map((bank, bIdx) =>
-        bank.map((cable, cIdx) => (
-          <mesh
-            key={`cable-${bIdx}-${cIdx}`}
-            geometry={cableGeometries[bIdx][cIdx]}
-            material={cable.isGold ? materials.goldCoax : materials.silverCoax}
-          />
-        ))
-      )}
+      {/* 1. Precision Semi-Rigid Coaxial Lines */}
+      {cableGeometries.map((geo, idx) => (
+        <mesh
+          key={`cable-run-${idx}`}
+          geometry={geo}
+          material={isGoldFlags[idx] ? materials.goldCoax : materials.silverCoax}
+        />
+      ))}
 
-      {/* 2. SMA Bulkhead Hex Nuts Clamping Cables at Each Stage */}
+      {/* 2. Hexagonal Brass SMA Bulkhead Nut Couplers */}
       {feedthroughs.map(([x, y, z], fIdx) => (
-        <group key={`feed-${fIdx}`} position={[x, y + 0.02, z]}>
+        <group key={`feed-${fIdx}`} position={[x, y + 0.015, z]}>
           <mesh>
-            <cylinderGeometry args={[0.011, 0.011, 0.016, 6]} />
+            <cylinderGeometry args={[0.009, 0.009, 0.018, 6]} />
             <primitive object={materials.smaConnector} attach="material" />
           </mesh>
         </group>
       ))}
 
-      {/* 3. Cryogenic RF Attenuator Canisters with Knurled Rings & Laser Labels */}
+      {/* 3. Cryogenic RF Attenuators with Laser-Marked Identification */}
       {attenuators.map((att, aIdx) => (
         <group key={`att-${aIdx}`} position={att.pos} rotation={att.rot}>
           {/* Main Attenuator Cylindrical Body */}
           <mesh>
-            <cylinderGeometry args={[0.016, 0.016, 0.08, 16]} />
+            <cylinderGeometry args={[0.014, 0.014, 0.08, 16]} />
             <primitive object={materials.attenuatorBody} attach="material" />
           </mesh>
 
-          {/* Top Brass SMA Coupling Nut */}
+          {/* Top SMA Connector */}
           <mesh position={[0, 0.045, 0]}>
-            <cylinderGeometry args={[0.013, 0.013, 0.018, 6]} />
+            <cylinderGeometry args={[0.011, 0.011, 0.016, 6]} />
             <primitive object={materials.smaConnector} attach="material" />
           </mesh>
 
-          {/* Bottom Brass SMA Coupling Nut */}
+          {/* Bottom SMA Connector */}
           <mesh position={[0, -0.045, 0]}>
-            <cylinderGeometry args={[0.013, 0.013, 0.018, 6]} />
+            <cylinderGeometry args={[0.011, 0.011, 0.016, 6]} />
             <primitive object={materials.smaConnector} attach="material" />
           </mesh>
 
-          {/* Laser-Etched Identification Collar */}
+          {/* Center Laser-Etched Identification Ring */}
           <mesh position={[0, 0, 0]}>
-            <cylinderGeometry args={[0.0165, 0.0165, 0.02, 16]} />
+            <cylinderGeometry args={[0.0145, 0.0145, 0.018, 16]} />
             <primitive object={materials.labelBand} attach="material" />
           </mesh>
         </group>

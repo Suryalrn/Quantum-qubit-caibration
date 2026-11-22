@@ -7,6 +7,7 @@ import { OrbitControls, PerspectiveCamera, Environment, ContactShadows } from "@
 import QuantumComputer from "./QuantumComputer";
 import ProcessorChip from "./ProcessorChip";
 import QubitArray from "./QubitArray";
+import JosephsonJunction3D from "./JosephsonJunction3D";
 import CalibrationVisualization from "./CalibrationVisualization";
 import FinalNetwork from "./FinalNetwork";
 
@@ -25,10 +26,10 @@ interface Waypoint {
 /**
  * Coordinated Continuous Camera Waypoints:
  * - Scene 01 (Hero): Wide 3/4 angle framing the full height of the golden chandelier on the right
- * - Scene 02 (Descent): Approaching cutaway thermal shields, braided copper straps & mixing chamber
+ * - Scene 02 (Descent): Approaching cutaway thermal stages, braided copper straps & mixing chamber
  * - Scene 03 (Processor): Macro push-in on silicon die, gold wire bonds, and ceramic carrier package
- * - Scene 04 (Qubit Architecture): Ultra-macro surface sweep across planar transmon pockets & CPW traces
- * - Scene 05 (Calibration): Explanatory holographic Bloch sphere & microwave pulse train on the right
+ * - Scene 04 (Microscopic Hero Shot): Deep zoom into the Al/AlOx/Al Dolan bridge Josephson junction & Cooper-pair cloud
+ * - Scene 05 (Calibration): Explanatory holographic Bloch sphere & microwave DRAG pulse train
  * - Scene 06 (Final Reveal): Panoramic pullback revealing the central machine in a distributed quantum network
  */
 const WAYPOINTS: Waypoint[] = [
@@ -45,16 +46,16 @@ const WAYPOINTS: Waypoint[] = [
     fov: 35,
   },
   {
-    t: 0.42,
-    pos: [0.80, -1.35, 0.65],
+    t: 0.40,
+    pos: [0.82, -1.32, 0.65],
     target: [1.05, -1.45, 0.0],
     fov: 30,
   },
   {
-    t: 0.62,
-    pos: [0.92, -1.38, 0.35],
-    target: [1.05, -1.45, 0.018],
-    fov: 28,
+    t: 0.60,
+    pos: [0.95, -0.72, 1.55],
+    target: [0.95, -0.90, 0.25],
+    fov: 30,
   },
   {
     t: 0.80,
@@ -116,8 +117,8 @@ function CameraFlightController({
     );
 
     // Subtle responsive mouse parallax
-    const px = state.pointer.x * 0.22;
-    const py = state.pointer.y * 0.16;
+    const px = state.pointer.x * 0.18;
+    const py = state.pointer.y * 0.12;
     desiredPos.current.x += px;
     desiredPos.current.y += py;
 
@@ -215,7 +216,7 @@ export default function InsideQuantumCanvas({
         color="#080B18"
       />
 
-      {/* All 6 Continuous Scenes in Cohesive Spatial Assembly */}
+      {/* All Continuous Scenes in Cohesive Spatial Assembly */}
       <group>
         {/* Physical Cryogenic Hardware Assembly */}
         <group>
@@ -225,8 +226,11 @@ export default function InsideQuantumCanvas({
           {/* Scene 03: High-Resistivity Silicon Processor & Wirebonds */}
           <ProcessorChip scrollProgress={scrollProgress} />
 
-          {/* Scene 04: Heavy-Hex Transmon Qubit Lattice & Active Packets */}
+          {/* Scene 04: Heavy-Hex Transmon Qubit Lattice & Active Couplers */}
           <QubitArray scrollProgress={scrollProgress} />
+
+          {/* Scene 04 Hero: Josephson Junction Dolan Bridge (SIS Tunnel Barrier & Cooper Pairs) */}
+          <JosephsonJunction3D scrollProgress={scrollProgress} />
         </group>
 
         {/* Scene 05: Explanatory Mathematical State Tomography & Pulse Waveform */}

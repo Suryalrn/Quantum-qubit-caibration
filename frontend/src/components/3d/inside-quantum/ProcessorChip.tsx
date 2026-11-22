@@ -129,8 +129,8 @@ export default function ProcessorChip({ scrollProgress }: ProcessorChipProps) {
     };
   }, [wireBondGeos]);
 
-  // Active during scenes 3, 4, and in wide network reveal Scene 6 (hidden during scene 5 calibration)
-  const isVisible = (scrollProgress >= 0.28 && scrollProgress <= 0.72) || scrollProgress >= 0.86;
+  // Active during Scene 3 (macro chip push-in) and Scene 6 (wide network reveal)
+  const isVisible = (scrollProgress >= 0.25 && scrollProgress <= 0.52) || scrollProgress >= 0.86;
   if (!isVisible) return null;
 
   return (

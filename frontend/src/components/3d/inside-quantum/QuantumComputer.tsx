@@ -2,6 +2,7 @@
 
 import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import CoolingStages from "./CoolingStages";
 import MicrowaveCables from "./MicrowaveCables";
 import CryogenicChamber from "./CryogenicChamber";
@@ -21,7 +22,25 @@ interface QuantumComputerProps {
  */
 export default function QuantumComputer({ scrollProgress }: QuantumComputerProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const gantryRef = useRef<THREE.Group>(null);
   const brushedTexture = useMemo(() => getBrushedMetalTexture(), []);
+
+  useFrame(() => {
+    const p = scrollProgress;
+    let gantryOpacity = 1.0;
+    if (p >= 0.35 && p <= 0.78) {
+      if (p < 0.42) {
+        gantryOpacity = 1.0 - (p - 0.35) / 0.07;
+      } else if (p > 0.72) {
+        gantryOpacity = (p - 0.72) / 0.06;
+      } else {
+        gantryOpacity = 0.0;
+      }
+    }
+    if (gantryRef.current) {
+      gantryRef.current.visible = gantryOpacity > 0.01;
+    }
+  });
 
   const materials = useMemo(() => {
     return {
@@ -48,46 +67,48 @@ export default function QuantumComputer({ scrollProgress }: QuantumComputerProps
 
   return (
     <group ref={groupRef} position={[0.95, 0.0, 0.0]}>
-      {/* 1. Top Laboratory Suspension Gantry Ring & Vacuum Collar */}
-      <group position={[0, 1.82, 0]}>
-        <mesh>
-          <cylinderGeometry args={[1.05, 1.05, 0.08, 48]} />
-          <primitive object={materials.gantryFlange} attach="material" />
-        </mesh>
-        {/* Perimeter Flange Clamp Ring (FLAT horizontal) */}
-        <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.06, 0.012, 12, 48]} />
-          <primitive object={materials.gantryFlange} attach="material" />
-        </mesh>
+      {/* 1 & 2. Top Laboratory Suspension Gantry Ring & Ceiling Cables */}
+      <group ref={gantryRef}>
+        <group position={[0, 1.82, 0]}>
+          <mesh>
+            <cylinderGeometry args={[1.05, 1.05, 0.08, 48]} />
+            <primitive object={materials.gantryFlange} attach="material" />
+          </mesh>
+          {/* Perimeter Flange Clamp Ring (FLAT horizontal) */}
+          <mesh position={[0, 0.045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[1.06, 0.012, 12, 48]} />
+            <primitive object={materials.gantryFlange} attach="material" />
+          </mesh>
+        </group>
+
+        {/* Ceiling Suspension Cables with Turnbuckles (4 cables rising to lab ceiling) */}
+        {[0, 1, 2, 3].map((idx) => {
+          const ang = (idx / 4) * Math.PI * 2 + 0.4;
+          const x = Math.cos(ang) * 0.92;
+          const z = Math.sin(ang) * 0.92;
+          return (
+            <group key={`gantry-cable-${idx}`} position={[x, 0, z]}>
+              {/* Cable Run */}
+              <mesh position={[0, 2.35, 0]}>
+                <cylinderGeometry args={[0.007, 0.007, 0.95, 12]} />
+                <primitive object={materials.cableSteel} attach="material" />
+              </mesh>
+
+              {/* Turnbuckle Cable Tensioner Body */}
+              <mesh position={[0, 1.95, 0]}>
+                <cylinderGeometry args={[0.016, 0.016, 0.08, 12]} />
+                <primitive object={materials.turnbuckleBrass} attach="material" />
+              </mesh>
+
+              {/* Mounting Eyelet */}
+              <mesh position={[0, 1.88, 0]}>
+                <torusGeometry args={[0.014, 0.005, 8, 16]} />
+                <primitive object={materials.cableSteel} attach="material" />
+              </mesh>
+            </group>
+          );
+        })}
       </group>
-
-      {/* 2. Ceiling Suspension Cables with Turnbuckles (4 cables rising to lab ceiling) */}
-      {[0, 1, 2, 3].map((idx) => {
-        const ang = (idx / 4) * Math.PI * 2 + 0.4;
-        const x = Math.cos(ang) * 0.92;
-        const z = Math.sin(ang) * 0.92;
-        return (
-          <group key={`gantry-cable-${idx}`} position={[x, 0, z]}>
-            {/* Cable Run */}
-            <mesh position={[0, 2.35, 0]}>
-              <cylinderGeometry args={[0.007, 0.007, 0.95, 12]} />
-              <primitive object={materials.cableSteel} attach="material" />
-            </mesh>
-
-            {/* Turnbuckle Cable Tensioner Body */}
-            <mesh position={[0, 1.95, 0]}>
-              <cylinderGeometry args={[0.016, 0.016, 0.08, 12]} />
-              <primitive object={materials.turnbuckleBrass} attach="material" />
-            </mesh>
-
-            {/* Mounting Eyelet */}
-            <mesh position={[0, 1.88, 0]}>
-              <torusGeometry args={[0.014, 0.005, 8, 16]} />
-              <primitive object={materials.cableSteel} attach="material" />
-            </mesh>
-          </group>
-        );
-      })}
 
       {/* 3. Structural Gold-Plated Cooling Stages */}
       <CoolingStages scrollProgress={scrollProgress} />

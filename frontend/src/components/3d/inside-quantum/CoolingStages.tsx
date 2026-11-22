@@ -26,6 +26,7 @@ interface CoolingStagesProps {
 export default function CoolingStages({ scrollProgress }: CoolingStagesProps) {
   const groupRef = useRef<THREE.Group>(null);
   const upperGroupRef = useRef<THREE.Group>(null);
+  const lowerGroupRef = useRef<THREE.Group>(null);
   const brushedTexture = useMemo(() => getBrushedMetalTexture(), []);
 
   // Shared PBR materials with realistic brushed metallic grain and smooth transparency support
@@ -184,6 +185,21 @@ export default function CoolingStages({ scrollProgress }: CoolingStagesProps) {
       upperGroupRef.current.visible = upperOpacity > 0.01;
     }
 
+    // 3. Lowest stage (mixing chamber) fades out during microscopic Dolan bridge inspection (Scene 4) and Bloch sphere (Scene 5)
+    let lowerOpacity = 1.0;
+    if (p >= 0.52 && p <= 0.86) {
+      if (p < 0.58) {
+        lowerOpacity = 1.0 - (p - 0.52) / 0.06;
+      } else if (p > 0.80) {
+        lowerOpacity = (p - 0.80) / 0.06;
+      } else {
+        lowerOpacity = 0.0;
+      }
+    }
+    if (lowerGroupRef.current) {
+      lowerGroupRef.current.visible = lowerOpacity > 0.01;
+    }
+
     // Apply smooth opacities to materials
     const effectiveOpacity = Math.max(0, Math.min(1, mainOpacity * upperOpacity));
     materials.goldPlating.opacity = Math.max(0, Math.min(1, mainOpacity));
@@ -327,7 +343,7 @@ export default function CoolingStages({ scrollProgress }: CoolingStagesProps) {
         const st = stageSpecs[5];
         const boltRadius = st.r - 0.035;
         return (
-          <group position={[0, st.y, 0]}>
+          <group ref={lowerGroupRef} position={[0, st.y, 0]}>
             {/* Main Stage Disc */}
             <mesh>
               <cylinderGeometry args={[st.r, st.r, st.h, 48]} />
