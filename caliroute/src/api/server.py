@@ -72,6 +72,9 @@ class PlatformState:
     forecaster_checkpoint: Optional[Dict[str, Any]] = None
     circuits: Optional[Dict[str, Any]] = None
     full_benchmark_df: Optional[pd.DataFrame] = None
+    backend_snapshots: Dict[str, Dict[str, Any]] = {}
+    topologies_2d: Dict[str, Dict[int, List[float]]] = {}
+    topologies_3d: Dict[str, Dict[int, List[float]]] = {}
     topology_2d: Dict[int, List[float]] = {}
     topology_3d: Dict[int, List[float]] = {}
 
@@ -82,11 +85,70 @@ def initialize_state():
     """Pre-caches calibration snapshots, graphs, coordinates, and models."""
     logger.info("Initializing Quantum Calibration Intelligence State...")
     try:
-        # 1. Base calibration snapshot
-        state.base_snapshot = get_latest_calibration_snapshot("data/raw/calibration")
+        # Pre-cache available backends: Kingston, Sherbrooke, Brisbane
+        backend_files = {
+            "ibm_kingston": "data/raw/calibration/calibration_ibm_kingston_latest.json",
+            "ibm_sherbrooke": "data/raw/calibration/calibration_ibm_sherbrooke_latest.json",
+            "ibm_brisbane": "data/raw/calibration/calibration_ibm_brisbane_latest.json",
+        }
+
+        for b_id, rel_path in backend_files.items():
+            full_path = os.path.join(os.path.dirname(__file__), "..", "..", rel_path)
+            if not os.path.exists(full_path):
+                full_path = rel_path
+            if os.path.exists(full_path):
+                try:
+                    with open(full_path, "r") as f:
+                        snap_data = json.load(f)
+                    state.backend_snapshots[b_id] = snap_data
+
+                    # Build graph and precompute deterministic layout
+                    G_b = nx.Graph()
+                    for edge in snap_data.get("coupling_map", []):
+                        if len(edge) >= 2:
+                            G_b.add_edge(int(edge[0]), int(edge[1]))
+
+                    pos_2d = nx.spring_layout(G_b, seed=42, dim=2, k=0.18, iterations=100)
+                    pos_3d = nx.spring_layout(G_b, seed=42, dim=3, k=0.25, iterations=100)
+
+                    b_top_2d = {}
+                    b_top_3d = {}
+                    num_q = snap_data.get("metadata", {}).get("num_qubits", len(snap_data.get("qubits", {})))
+                    for q in range(num_q):
+                        p2 = pos_2d.get(q, np.array([0.0, 0.0]))
+                        b_top_2d[q] = [float(p2[0] * 12.0), float(p2[1] * 12.0)]
+                        p3 = pos_3d.get(q, np.array([0.0, 0.0, 0.0]))
+                        b_top_3d[q] = [float(p3[0] * 14.0), float(p3[1] * 14.0), float(p3[2] * 8.0)]
+
+                    state.topologies_2d[b_id] = b_top_2d
+                    state.topologies_3d[b_id] = b_top_3d
+                    logger.info(f"Loaded backend snapshot for {b_id} ({num_q} qubits)")
+                except Exception as b_err:
+                    logger.warning(f"Failed to load backend {b_id} from {full_path}: {b_err}")
+
+        # 1. Base calibration snapshot (primary: ibm_kingston)
+        if "ibm_kingston" in state.backend_snapshots:
+            state.base_snapshot = state.backend_snapshots["ibm_kingston"]
+            state.topology_2d = state.topologies_2d["ibm_kingston"]
+            state.topology_3d = state.topologies_3d["ibm_kingston"]
+        else:
+            state.base_snapshot = get_latest_calibration_snapshot("data/raw/calibration")
+            G = nx.Graph()
+            for edge in state.base_snapshot.get("coupling_map", []):
+                if len(edge) >= 2:
+                    G.add_edge(int(edge[0]), int(edge[1]))
+            pos_2d = nx.spring_layout(G, seed=42, dim=2, k=0.18, iterations=100)
+            pos_3d = nx.spring_layout(G, seed=42, dim=3, k=0.25, iterations=100)
+            for q in range(state.base_snapshot["metadata"]["num_qubits"]):
+                p2 = pos_2d.get(q, np.array([0.0, 0.0]))
+                state.topology_2d[q] = [float(p2[0] * 12.0), float(p2[1] * 12.0)]
+                p3 = pos_3d.get(q, np.array([0.0, 0.0, 0.0]))
+                state.topology_3d[q] = [float(p3[0] * 14.0), float(p3[1] * 14.0), float(p3[2] * 8.0)]
 
         # 2. Forecasted calibration snapshot
         forecast_path = "data/processed/forecasted_calibration_latest.json"
+        if not os.path.exists(forecast_path):
+            forecast_path = os.path.join(os.path.dirname(__file__), "..", "..", forecast_path)
         if os.path.exists(forecast_path):
             with open(forecast_path, "r") as f:
                 state.forecasted_snapshot = json.load(f)
@@ -94,10 +156,15 @@ def initialize_state():
             state.forecasted_snapshot = copy.deepcopy(state.base_snapshot)
 
         # 3. Benchmark Circuits
-        state.circuits = load_benchmark_circuits("data/circuits")
+        circuits_dir = "data/circuits"
+        if not os.path.exists(circuits_dir):
+            circuits_dir = os.path.join(os.path.dirname(__file__), "..", "..", circuits_dir)
+        state.circuits = load_benchmark_circuits(circuits_dir)
 
         # 4. GNN Scorer Model Checkpoint
         gnn_path = "results/gnn_scorer_best.pt"
+        if not os.path.exists(gnn_path):
+            gnn_path = os.path.join(os.path.dirname(__file__), "..", "..", gnn_path)
         if os.path.exists(gnn_path):
             ckpt = torch.load(gnn_path, map_location="cpu", weights_only=False)
             state.gnn_checkpoint = ckpt
@@ -111,30 +178,17 @@ def initialize_state():
 
         # 5. Drift Forecaster Checkpoint
         drift_path = "results/drift_forecaster_best.pt"
+        if not os.path.exists(drift_path):
+            drift_path = os.path.join(os.path.dirname(__file__), "..", "..", drift_path)
         if os.path.exists(drift_path):
             state.forecaster_checkpoint = torch.load(drift_path, map_location="cpu", weights_only=False)
 
         # 6. Full Benchmark Results
         bench_csv = "results/caliroute_full_benchmark.csv"
+        if not os.path.exists(bench_csv):
+            bench_csv = os.path.join(os.path.dirname(__file__), "..", "..", bench_csv)
         if os.path.exists(bench_csv):
             state.full_benchmark_df = pd.read_csv(bench_csv)
-
-        # 7. Precompute deterministic 2D and 3D graph coordinates for 156 qubits
-        G = nx.Graph()
-        for edge in state.base_snapshot.get("coupling_map", []):
-            if len(edge) >= 2:
-                G.add_edge(int(edge[0]), int(edge[1]))
-
-        pos_2d = nx.spring_layout(G, seed=42, dim=2, k=0.18, iterations=100)
-        pos_3d = nx.spring_layout(G, seed=42, dim=3, k=0.25, iterations=100)
-
-        for q in range(state.base_snapshot["metadata"]["num_qubits"]):
-            # Scale to normalized viewing space [-10, 10]
-            p2 = pos_2d.get(q, np.array([0.0, 0.0]))
-            state.topology_2d[q] = [float(p2[0] * 12.0), float(p2[1] * 12.0)]
-
-            p3 = pos_3d.get(q, np.array([0.0, 0.0, 0.0]))
-            state.topology_3d[q] = [float(p3[0] * 14.0), float(p3[1] * 14.0), float(p3[2] * 8.0)]
 
         logger.info("Quantum Calibration Intelligence Platform initialized successfully.")
     except Exception as e:
@@ -184,6 +238,9 @@ def get_health():
 def list_backends():
     """Lists available IBM Quantum processors and telemetry sources."""
     meta = state.base_snapshot.get("metadata", {}) if state.base_snapshot else {}
+    sherbrooke_snap = state.backend_snapshots.get("ibm_sherbrooke", {})
+    brisbane_snap = state.backend_snapshots.get("ibm_brisbane", {})
+
     return {
         "active_backend_id": "ibm_kingston",
         "backends": [
@@ -203,24 +260,24 @@ def list_backends():
                 "id": "ibm_sherbrooke",
                 "name": "IBM Sherbrooke",
                 "family": "Eagle r3",
-                "qubits": 127,
-                "couplers": 288,
+                "qubits": sherbrooke_snap.get("metadata", {}).get("num_qubits", 127),
+                "couplers": len(sherbrooke_snap.get("coupling_map", [])) * 2 if sherbrooke_snap else 288,
                 "basis_gates": ["ecr", "sx", "x", "rz", "id"],
                 "native_2q_gate": "ecr",
-                "calibration_timestamp": "Historical Archive",
-                "status": "Reference Topology",
+                "calibration_timestamp": sherbrooke_snap.get("metadata", {}).get("timestamp", "Authentic Calibration"),
+                "status": "Authentic Calibration (FakeSherbrooke)",
                 "is_active": False,
             },
             {
                 "id": "ibm_brisbane",
                 "name": "IBM Brisbane",
                 "family": "Eagle r3",
-                "qubits": 127,
-                "couplers": 288,
+                "qubits": brisbane_snap.get("metadata", {}).get("num_qubits", 127),
+                "couplers": len(brisbane_snap.get("coupling_map", [])) * 2 if brisbane_snap else 288,
                 "basis_gates": ["ecr", "sx", "x", "rz", "id"],
                 "native_2q_gate": "ecr",
-                "calibration_timestamp": "Historical Archive",
-                "status": "Reference Topology",
+                "calibration_timestamp": brisbane_snap.get("metadata", {}).get("timestamp", "Authentic Calibration"),
+                "status": "Authentic Calibration (FakeBrisbane)",
                 "is_active": False,
             }
         ]
@@ -233,18 +290,27 @@ def get_backend_topology(backend_id: str):
     Returns 2D and 3D node coordinates, connectivity edges, and physical calibration
     states for the interactive 3D WebGL quantum processor.
     """
-    if not state.base_snapshot:
+    snap = state.backend_snapshots.get(backend_id) or state.base_snapshot
+    if not snap:
         raise HTTPException(status_code=503, detail="Backend data not loaded")
 
-    snap = state.base_snapshot
     qubits_dict = snap.get("qubits", {})
     edges_dict = snap.get("edges", {})
     coupling_map = snap.get("coupling_map", [])
 
-    dead_known = {113, 121, 131, 146}
-    nodes = []
+    dead_known_map = {
+        "ibm_kingston": {113, 121, 131, 146},
+        "ibm_sherbrooke": {84, 92},
+        "ibm_brisbane": set(),
+    }
+    dead_known = dead_known_map.get(backend_id, set())
 
-    for q_idx in range(snap["metadata"]["num_qubits"]):
+    nodes = []
+    top_2d = state.topologies_2d.get(backend_id, state.topology_2d)
+    top_3d = state.topologies_3d.get(backend_id, state.topology_3d)
+    num_qubits = snap.get("metadata", {}).get("num_qubits", len(qubits_dict))
+
+    for q_idx in range(num_qubits):
         q_data = qubits_dict.get(str(q_idx), {})
         t1_s = float(q_data.get("t1", 0.0))
         t2_s = float(q_data.get("t2", 0.0))
@@ -261,8 +327,8 @@ def get_backend_topology(backend_id: str):
             status = "operational"
             error_tier = "optimal"
 
-        pos2 = state.topology_2d.get(q_idx, [0.0, 0.0])
-        pos3 = state.topology_3d.get(q_idx, [0.0, 0.0, 0.0])
+        pos2 = top_2d.get(q_idx, [0.0, 0.0])
+        pos3 = top_3d.get(q_idx, [0.0, 0.0, 0.0])
 
         nodes.append({
             "id": q_idx,

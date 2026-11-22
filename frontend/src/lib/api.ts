@@ -75,7 +75,7 @@ export async function getBackends(): Promise<{ active_backend_id: string; backen
 }
 
 export async function getTopology(backendId: string = "ibm_kingston"): Promise<TopologyData> {
-  return fetchWithFallback(`/api/backends/${backendId}/topology`, generateMockTopology());
+  return fetchWithFallback(`/api/backends/${backendId}/topology`, generateMockTopology(backendId));
 }
 
 export async function getAnalytics(): Promise<AnalyticsData> {
@@ -361,38 +361,46 @@ export async function getBenchmarkRecords(): Promise<{ suite_name: string; total
   });
 }
 
-export function generateMockTopology(): TopologyData {
+export function generateMockTopology(backendId: string = "ibm_kingston"): TopologyData {
+  const is127Q = backendId === "ibm_sherbrooke" || backendId === "ibm_brisbane";
+  const numQubits = is127Q ? 127 : 156;
+  const dead = backendId === "ibm_kingston"
+    ? [113, 121, 131, 146]
+    : backendId === "ibm_sherbrooke"
+    ? [84, 92]
+    : [];
+
   const nodes = [];
   const edges = [];
-  const dead = [113, 121, 131, 146];
+  const cols = is127Q ? 13 : 14;
 
-  for (let i = 0; i < 156; i++) {
+  for (let i = 0; i < numQubits; i++) {
     const isDead = dead.includes(i);
-    const col = i % 14;
-    const row = Math.floor(i / 14);
+    const col = i % cols;
+    const row = Math.floor(i / cols);
     nodes.push({
       id: i,
       label: `Q${i}`,
-      x2d: (col - 7) * 1.5,
+      x2d: (col - (cols / 2)) * 1.5,
       y2d: (row - 5) * 1.5,
-      x3d: (col - 7) * 1.6,
+      x3d: (col - (cols / 2)) * 1.6,
       y3d: (row - 5) * 1.6,
       z3d: Math.sin(col * 0.4) * Math.cos(row * 0.4) * 2.0,
-      t1_us: isDead ? 0.0 : 220 + (i * 17) % 180,
-      t2_us: isDead ? 0.0 : 120 + (i * 13) % 140,
-      readout_error_pct: isDead ? 49.68 : 0.4 + ((i * 7) % 20) / 10,
-      readout_length_ns: 2180,
+      t1_us: isDead ? 0.0 : (is127Q ? 240 + (i * 19) % 150 : 220 + (i * 17) % 180),
+      t2_us: isDead ? 0.0 : (is127Q ? 140 + (i * 11) % 120 : 120 + (i * 13) % 140),
+      readout_error_pct: isDead ? 49.68 : (is127Q ? 0.6 + ((i * 5) % 25) / 10 : 0.4 + ((i * 7) % 20) / 10),
+      readout_length_ns: is127Q ? 1800 : 2180,
       status: isDead ? ("dead" as const) : ("operational" as const),
       error_tier: isDead ? ("critical" as const) : ("optimal" as const),
     });
 
-    if (col < 13) {
+    if (col < cols - 1 && i + 1 < numQubits) {
       edges.push({
         source: i,
         target: i + 1,
         key: `${i}_${i+1}`,
         cz_error_pct: isDead ? 25.0 : 0.6 + ((i * 3) % 12) / 10,
-        duration_ns: 68.0,
+        duration_ns: is127Q ? 96.0 : 68.0,
         is_primary: true,
         status: isDead ? ("broken" as const) : ("operational" as const),
       });
@@ -400,8 +408,8 @@ export function generateMockTopology(): TopologyData {
   }
 
   return {
-    backend_id: "ibm_kingston",
-    total_qubits: 156,
+    backend_id: backendId,
+    total_qubits: numQubits,
     total_edges: edges.length,
     nodes,
     edges,

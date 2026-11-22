@@ -15,16 +15,28 @@ export default function HardwareExplorerPage() {
   const [filterTier, setFilterTier] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"3d" | "2d">("3d");
 
+  const selectedBackend = backends.find((b) => b.id === selectedBackendId) || {
+    id: selectedBackendId,
+    name: selectedBackendId === "ibm_sherbrooke" ? "IBM Sherbrooke" : selectedBackendId === "ibm_brisbane" ? "IBM Brisbane" : "IBM Kingston",
+    family: selectedBackendId === "ibm_kingston" ? "Heron r1" : "Eagle r3",
+    qubits: selectedBackendId === "ibm_kingston" ? 156 : 127,
+    couplers: selectedBackendId === "ibm_kingston" ? 352 : 288,
+    native_2q_gate: selectedBackendId === "ibm_kingston" ? "cz" : "ecr",
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
         const bRes = await getBackends();
-        setBackends(bRes.backends);
+        if (bRes.backends && bRes.backends.length > 0) {
+          setBackends(bRes.backends);
+        }
         const topRes = await getTopology(selectedBackendId);
         setTopology(topRes);
-        // Default select qubit 67 (highest quality transmon)
-        if (topRes.nodes.length > 67) {
-          setSelectedQubit(topRes.nodes[67]);
+        // Default select an optimal qubit for this backend
+        if (topRes.nodes && topRes.nodes.length > 0) {
+          const optimalNode = topRes.nodes.find((n) => n.status === "operational" && n.error_tier === "optimal") || topRes.nodes[0];
+          setSelectedQubit(optimalNode);
         }
       } catch (err) {
         console.error("Failed to load topology:", err);
@@ -41,6 +53,11 @@ export default function HardwareExplorerPage() {
       setSelectedQubit(topology.nodes[queryNum]);
     }
   }, [searchQuery, topology]);
+
+  const deadQubits = React.useMemo(() => {
+    if (!topology) return [];
+    return topology.nodes.filter((n) => n.status === "dead" || n.error_tier === "critical").map((n) => n.id);
+  }, [topology]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -98,9 +115,11 @@ export default function HardwareExplorerPage() {
               </div>
 
               <div className="hidden sm:flex items-center gap-2 bg-[#141110]/90 rounded border border-white/10 px-3 py-1 text-xs font-mono text-text-muted">
-                <span>Heron r1 Heavy-Hex</span>
+                <span className="text-accent-gold font-medium">{selectedBackend.family} Heavy-Hex</span>
                 <span>•</span>
-                <span>352 Directed Couplers</span>
+                <span>{topology?.edges.length ?? selectedBackend.couplers} Directed Couplers</span>
+                <span>•</span>
+                <span>{topology?.nodes.length ?? selectedBackend.qubits} Qubits</span>
               </div>
             </div>
 
@@ -141,7 +160,7 @@ export default function HardwareExplorerPage() {
                 onChange={(e) => setFilterTier(e.target.value)}
                 className="bg-[#141110] border border-white/10 rounded px-2.5 py-1 text-xs text-text-primary outline-none focus:border-accent-gold"
               >
-                <option value="all">All Qubits (156)</option>
+                <option value="all">All Qubits ({topology?.nodes.length ?? selectedBackend.qubits})</option>
                 <option value="optimal">Optimal (Champagne Gold)</option>
                 <option value="warning">Degraded (Warm Amber)</option>
                 <option value="dead">Dead / Defective (Wine Burgundy)</option>
@@ -219,12 +238,12 @@ export default function HardwareExplorerPage() {
           <div className="glass-panel p-5 rounded-xl border border-white/10 space-y-3 font-mono text-xs">
             <div className="font-bold text-text-primary pb-2 border-b border-white/10 uppercase text-xs flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5 text-accent-gold" />
-              Heron Architecture Specs
+              {selectedBackend.family} Architecture Specs
             </div>
             <div className="space-y-2 text-text-secondary">
               <div className="flex justify-between">
                 <span>Processor:</span>
-                <span className="text-text-primary font-bold">IBM Kingston</span>
+                <span className="text-text-primary font-bold">{selectedBackend.name}</span>
               </div>
               <div className="flex justify-between">
                 <span>Lattice Type:</span>
@@ -232,19 +251,23 @@ export default function HardwareExplorerPage() {
               </div>
               <div className="flex justify-between">
                 <span>Total Nodes:</span>
-                <span className="text-text-primary">156 Physical Qubits</span>
+                <span className="text-text-primary">{topology?.nodes.length ?? selectedBackend.qubits} Physical Qubits</span>
               </div>
               <div className="flex justify-between">
                 <span>Coupling Map:</span>
-                <span className="text-text-primary">352 Directed Edges</span>
+                <span className="text-text-primary">{topology?.edges.length ?? selectedBackend.couplers} Directed Edges</span>
               </div>
               <div className="flex justify-between">
                 <span>Native 2Q Gate:</span>
-                <span className="text-accent-gold font-bold">CZ (Control-Z)</span>
+                <span className="text-accent-gold font-bold">
+                  {selectedBackend.native_2q_gate?.toUpperCase() === "CZ" ? "CZ (Control-Z)" : "ECR (Echoed Cross-Resonance)"}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Dead Physical Qubits:</span>
-                <span className="text-[#D98282] font-bold">113, 121, 131, 146</span>
+                <span className={deadQubits.length > 0 ? "text-[#D98282] font-bold" : "text-status-optimal font-bold"}>
+                  {deadQubits.length > 0 ? deadQubits.join(", ") : "0 (None Detected)"}
+                </span>
               </div>
             </div>
           </div>
