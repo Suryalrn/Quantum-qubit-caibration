@@ -28,6 +28,7 @@ export default function FinalNetwork({ scrollProgress }: FinalNetworkProps) {
   const groupRef = useRef<THREE.Group>(null);
   const particlesRef = useRef<THREE.Points>(null);
   const packetMeshRef = useRef<THREE.InstancedMesh>(null);
+  const currentOpacity = useRef<number>(0);
 
   // 6 satellite QPU nodes orbiting the central quantum computer (located at X=0.95, Y=0.0)
   const nodes: QuantumNode[] = useMemo(() => [
@@ -130,10 +131,20 @@ export default function FinalNetwork({ scrollProgress }: FinalNetworkProps) {
       });
       packetMeshRef.current.instanceMatrix.needsUpdate = true;
     }
-  });
 
-  const isVisible = scrollProgress >= 0.78;
-  if (!isVisible) return null;
+    // Continuous smooth opacity interpolation for Scene 6 reveal
+    const p = scrollProgress;
+    let target = 0.0;
+    if (p >= 0.85) {
+      target = Math.min(1.0, (p - 0.85) / 0.08);
+    }
+    currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, target, 0.08);
+    const alpha = currentOpacity.current;
+
+    if (groupRef.current) {
+      groupRef.current.visible = alpha > 0.008;
+    }
+  });
 
   return (
     <group ref={groupRef}>

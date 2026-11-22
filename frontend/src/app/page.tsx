@@ -54,6 +54,7 @@ export default function InsideTheQuantumLanding() {
       wheelMultiplier: 0.9,
     });
     lenisRef.current = lenis;
+    (window as any).__lenisInstance = lenis;
 
     function raf(time: number) {
       lenis.raf(time);
@@ -422,14 +423,14 @@ export default function InsideTheQuantumLanding() {
         {/* -------------------------------------------------------------------
             SCENE 06 — QUANTUM ECOSYSTEM (FINAL REVEAL)
             ------------------------------------------------------------------- */}
-        <section className="relative min-h-[115vh] pt-28 pb-16 flex flex-col justify-center items-center text-center px-6 md:px-16 lg:px-24">
-          <div className="max-w-2xl p-8 sm:p-10 rounded-3xl bg-[#0B0F19]/80 backdrop-blur-xl border border-border-light shadow-card-cryo">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B0F19]/70 border border-accent-cyan/30 text-xs text-accent-cyan font-mono mb-4 shadow-cyan-glow">
+        <section className="relative min-h-screen pt-24 pb-16 flex flex-col justify-center items-center text-center px-6 md:px-16 lg:px-24">
+          <div className="max-w-2xl p-6 sm:p-7 rounded-3xl bg-[#0B0F19]/85 backdrop-blur-xl border border-border-light shadow-card-cryo">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0B0F19]/70 border border-accent-cyan/30 text-xs text-accent-cyan font-mono mb-3 shadow-cyan-glow">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
               CONNECTED QUANTUM INTELLIGENCE
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-bold text-[#F8FAFC] tracking-tight leading-tight mb-4">
+            <h2 className="text-2xl sm:text-4xl font-bold text-[#F8FAFC] tracking-tight leading-tight mb-3">
               Making Quantum Computing
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-accent-azure to-accent-gold">
@@ -437,80 +438,80 @@ export default function InsideTheQuantumLanding() {
               </span>
             </h2>
 
-            <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-8 max-w-xl mx-auto">
+            <p className="text-xs sm:text-sm text-text-secondary leading-relaxed mb-5 max-w-lg mx-auto">
               Exploring noise-aware, hardware-aware quantum optimization. Bridging theoretical quantum algorithms
               with physical devices through machine learning and defect-immune graph routing.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
               <Link
                 href="/routing"
-                className="flex items-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-accent-cyan via-accent-azure to-accent-gold text-[#06070B] font-bold text-sm shadow-lg shadow-accent-cyan/20 hover:brightness-110 transition-all"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan via-accent-azure to-accent-gold text-[#06070B] font-bold text-xs shadow-lg shadow-accent-cyan/20 hover:brightness-110 transition-all"
               >
-                <Zap className="w-4 h-4" />
+                <Zap className="w-3.5 h-3.5" />
                 <span>Discover Our Approach</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
               <Link
                 href="/analytics"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#0B0F19]/80 border border-border-light text-[#F8FAFC] font-semibold text-sm hover:border-accent-cyan/40 transition-all shadow-sm"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0B0F19]/80 border border-border-light text-[#F8FAFC] font-semibold text-xs hover:border-accent-cyan/40 transition-all shadow-sm"
               >
-                <Activity className="w-4 h-4 text-accent-cyan" />
+                <Activity className="w-3.5 h-3.5 text-accent-cyan" />
                 <span>View Benchmarks</span>
               </Link>
             </div>
 
             {/* Platform Feature Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
               <Link
                 href="/routing"
-                className="p-5 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-cyan/40 transition-all group shadow-card-cryo"
+                className="p-4 rounded-xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-cyan/40 transition-all group shadow-card-cryo"
               >
-                <div className="w-8 h-8 rounded-xl bg-accent-cyan/10 text-accent-cyan flex items-center justify-center mb-3 group-hover:scale-105 transition-transform border border-accent-cyan/20">
-                  <Terminal className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-accent-cyan/10 text-accent-cyan flex items-center justify-center mb-2 group-hover:scale-105 transition-transform border border-accent-cyan/20">
+                  <Terminal className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-1">OpenQASM 2.0 Studio</h3>
-                <p className="text-[11px] text-text-secondary leading-relaxed">
+                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-0.5">OpenQASM 2.0 Studio</h3>
+                <p className="text-[10px] text-text-secondary leading-relaxed">
                   Write custom circuits, compile ASTs, and compare SABRE vs GNN routing in real-time.
                 </p>
               </Link>
 
               <Link
                 href="/explorer"
-                className="p-5 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-gold/40 transition-all group shadow-card-cryo"
+                className="p-4 rounded-xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-gold/40 transition-all group shadow-card-cryo"
               >
-                <div className="w-8 h-8 rounded-xl bg-accent-gold/10 text-accent-gold flex items-center justify-center mb-3 group-hover:scale-105 transition-transform border border-accent-gold/20">
-                  <Cpu className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-accent-gold/10 text-accent-gold flex items-center justify-center mb-2 group-hover:scale-105 transition-transform border border-accent-gold/20">
+                  <Cpu className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-1">Hardware Topologies</h3>
-                <p className="text-[11px] text-text-secondary leading-relaxed">
+                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-0.5">Hardware Topologies</h3>
+                <p className="text-[10px] text-text-secondary leading-relaxed">
                   Interactive 3D inspection of IBM Kingston (156Q), Hummingbird, and Eagle chips.
                 </p>
               </Link>
 
               <Link
                 href="/ml"
-                className="p-5 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-violet/40 transition-all group shadow-card-cryo"
+                className="p-4 rounded-xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-violet/40 transition-all group shadow-card-cryo"
               >
-                <div className="w-8 h-8 rounded-xl bg-accent-violet/10 text-accent-violet flex items-center justify-center mb-3 group-hover:scale-105 transition-transform border border-accent-violet/20">
-                  <Layers className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-accent-violet/10 text-accent-violet flex items-center justify-center mb-2 group-hover:scale-105 transition-transform border border-accent-violet/20">
+                  <Layers className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-1">Dual-Encoder GNN</h3>
-                <p className="text-[11px] text-text-secondary leading-relaxed">
+                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-0.5">Dual-Encoder GNN</h3>
+                <p className="text-[10px] text-text-secondary leading-relaxed">
                   Graph Neural Network embedding circuit DAGs and hardware coupling graphs.
                 </p>
               </Link>
 
               <Link
                 href="/drift"
-                className="p-5 rounded-2xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-cyan/40 transition-all group shadow-card-cryo"
+                className="p-4 rounded-xl bg-[#0B0F19]/60 backdrop-blur-xl border border-border-light hover:border-accent-cyan/40 transition-all group shadow-card-cryo"
               >
-                <div className="w-8 h-8 rounded-xl bg-status-healthy/10 text-status-healthy flex items-center justify-center mb-3 group-hover:scale-105 transition-transform border border-status-healthy/20">
-                  <Clock className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-status-healthy/10 text-status-healthy flex items-center justify-center mb-2 group-hover:scale-105 transition-transform border border-status-healthy/20">
+                  <Clock className="w-3.5 h-3.5" />
                 </div>
-                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-1">Calibration Drift</h3>
-                <p className="text-[11px] text-text-secondary leading-relaxed">
+                <h3 className="text-xs font-semibold text-[#F8FAFC] mb-0.5">Calibration Drift</h3>
+                <p className="text-[10px] text-text-secondary leading-relaxed">
                   LSTM temporal forecasting predicting two-qubit gate error degradation over time.
                 </p>
               </Link>

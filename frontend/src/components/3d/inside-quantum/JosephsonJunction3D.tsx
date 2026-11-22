@@ -160,9 +160,9 @@ export default function JosephsonJunction3D({ scrollProgress }: JosephsonJunctio
     let targetOpacity = 0.0;
     let targetScale = 0.85;
 
-    if (p >= 0.48 && p <= 0.74) {
-      if (p < 0.56) {
-        const frac = (p - 0.48) / 0.08;
+    if (p >= 0.52 && p <= 0.74) {
+      if (p < 0.58) {
+        const frac = (p - 0.52) / 0.06;
         const eased = Math.sin((frac * Math.PI) / 2);
         targetOpacity = eased;
         targetScale = 0.85 + eased * 0.15;
@@ -220,48 +220,80 @@ export default function JosephsonJunction3D({ scrollProgress }: JosephsonJunctio
 
   return (
     <group ref={groupRef} position={[0.95, -0.90, 0.25]} rotation={[-0.20, 0, 0]}>
-      {/* 1. High-Resistivity Silicon Die Substrate */}
-      <mesh position={[0, 0, -0.02]}>
-        <boxGeometry args={[0.92, 0.68, 0.03]} />
+      {/* 1. High-Resistivity Silicon Die Substrate (Expanded Crystalline Wafer Base) */}
+      <mesh position={[0, 0, -0.025]}>
+        <boxGeometry args={[2.8, 2.0, 0.04]} />
         <primitive object={materials.siliconSubstrate} attach="material" />
       </mesh>
 
-      {/* 2. Thin-Film Niobium Ground Plane Clearance Frame */}
-      <mesh position={[0, 0, 0.0]}>
-        <ringGeometry args={[0.26, 0.44, 4, 1, Math.PI / 4]} />
+      {/* 2. Thin-Film Niobium Ground Plane with Etched Transmon Pocket Clearance */}
+      <mesh position={[0, 0, 0.001]}>
+        <ringGeometry args={[0.32, 0.72, 4, 1, Math.PI / 4]} />
         <primitive object={materials.groundPlaneNb} attach="material" />
       </mesh>
 
-      {/* 3. Bottom Aluminum Superconducting Electrode (Evaporated at -45°) */}
-      <group position={[-0.18, 0, 0.01]}>
-        {/* Main Feed Trace */}
-        <mesh>
+      {/* Electron-Beam Lithography Vernier Crosshairs & Fiducial Alignment Marks */}
+      {[-0.45, 0.45].map((fx, i) =>
+        [-0.32, 0.32].map((fy, j) => (
+          <group key={`fiducial-${i}-${j}`} position={[fx, fy, 0.002]}>
+            <mesh>
+              <planeGeometry args={[0.04, 0.003]} />
+              <primitive object={materials.reticleLine} attach="material" />
+            </mesh>
+            <mesh>
+              <planeGeometry args={[0.003, 0.04]} />
+              <primitive object={materials.reticleLine} attach="material" />
+            </mesh>
+          </group>
+        ))
+      )}
+
+      {/* 3. Bottom Aluminum Superconducting Electrode (Evaporated at -45° Angle) */}
+      <group position={[-0.20, 0, 0.010]}>
+        {/* Broad Coplanar Waveguide Center Conductor Pad */}
+        <mesh position={[-0.06, 0, 0]}>
           <boxGeometry args={[0.26, 0.16, 0.016]} />
           <primitive object={materials.aluminumBottom} attach="material" />
         </mesh>
-        {/* Overlap Finger */}
-        <mesh position={[0.15, 0, 0]}>
-          <boxGeometry args={[0.08, 0.06, 0.016]} />
+        {/* Tapered Dolan Bridge Lead Constriction */}
+        <mesh position={[0.11, 0, 0]}>
+          <boxGeometry args={[0.09, 0.055, 0.016]} />
+          <primitive object={materials.aluminumBottom} attach="material" />
+        </mesh>
+        {/* Sub-Micron Overlap Junction Finger */}
+        <mesh position={[0.18, 0, 0]}>
+          <boxGeometry args={[0.06, 0.024, 0.016]} />
           <primitive object={materials.aluminumBottom} attach="material" />
         </mesh>
       </group>
 
-      {/* 4. Amorphous AlOx Tunnel Barrier (~1.5nm Dielectric Layer) */}
-      <mesh position={[0.0, 0, 0.02]}>
-        <boxGeometry args={[0.022, 0.07, 0.02]} />
+      {/* Shadow Evaporation Ghost Artifact Trace (Physical Dolan Bridge Footprint) */}
+      <mesh position={[-0.04, 0.045, 0.002]}>
+        <planeGeometry args={[0.05, 0.020]} />
+        <meshBasicMaterial color="#64748B" transparent opacity={0.25} />
+      </mesh>
+
+      {/* 4. Amorphous AlOx Tunnel Barrier (~1.5nm Quantum Dielectric Layer) */}
+      <mesh position={[0.005, 0, 0.020]}>
+        <boxGeometry args={[0.016, 0.038, 0.022]} />
         <primitive object={materials.oxideBarrier} attach="material" />
       </mesh>
 
       {/* 5. Top Aluminum Counter-Electrode (Evaporated at +45°, Dolan Bridge Overlap) */}
-      <group position={[0.18, 0, 0.024]}>
-        {/* Main Feed Trace */}
-        <mesh>
+      <group position={[0.20, 0, 0.024]}>
+        {/* Broad Coplanar Waveguide Center Conductor Pad */}
+        <mesh position={[0.06, 0, 0]}>
           <boxGeometry args={[0.26, 0.16, 0.016]} />
           <primitive object={materials.aluminumTop} attach="material" />
         </mesh>
-        {/* Overlap Counter Finger Stepping Over Barrier */}
-        <mesh position={[-0.15, 0, -0.003]}>
-          <boxGeometry args={[0.08, 0.06, 0.016]} />
+        {/* Tapered Dolan Bridge Counter Lead */}
+        <mesh position={[-0.11, 0, 0]}>
+          <boxGeometry args={[0.09, 0.055, 0.016]} />
+          <primitive object={materials.aluminumTop} attach="material" />
+        </mesh>
+        {/* Overlap Counter Finger Stepping Directly Over the AlOx Barrier */}
+        <mesh position={[-0.18, 0, -0.003]}>
+          <boxGeometry args={[0.06, 0.024, 0.016]} />
           <primitive object={materials.aluminumTop} attach="material" />
         </mesh>
       </group>

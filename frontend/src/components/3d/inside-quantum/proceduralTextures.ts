@@ -28,7 +28,7 @@ export function getBrushedMetalTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
-  // Neutral grey base (128, 128, 128 for bump map zero displacement)
+  // Neutral grey base (128 for bump map zero displacement)
   ctx.fillStyle = "#808080";
   ctx.fillRect(0, 0, 512, 512);
 
@@ -83,8 +83,8 @@ export function getWovenBraidTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
-  // Base copper-gold tone
-  ctx.fillStyle = "#B45309";
+  // Base copper tone
+  ctx.fillStyle = "#9A4D1E";
   ctx.fillRect(0, 0, 256, 256);
 
   // Intertwined herringbone / cross-hatch weave pattern
@@ -92,11 +92,11 @@ export function getWovenBraidTexture(): THREE.CanvasTexture {
   for (let y = 0; y < 256; y += step) {
     for (let x = 0; x < 256; x += step) {
       const isDiagonal = ((x + y) / step) % 2 === 0;
-      ctx.fillStyle = isDiagonal ? "#D97706" : "#92400E";
+      ctx.fillStyle = isDiagonal ? "#B85D28" : "#7E3A12";
       ctx.fillRect(x, y, step, step);
 
       // Fine wire filament highlights
-      ctx.fillStyle = isDiagonal ? "#FBBF24" : "#78350F";
+      ctx.fillStyle = isDiagonal ? "#D97736" : "#642A0C";
       ctx.fillRect(x + 1, y + 1, step - 2, 2);
     }
   }
@@ -114,13 +114,15 @@ export function getWovenBraidTexture(): THREE.CanvasTexture {
 
 /**
  * Procedural Semiconductor Photolithography Die Texture:
- * Ultra-high-resolution photolithographic micro-patterns for the superconducting silicon die:
- * - Etched superconducting niobium ground plane (#152035)
- * - 25,000+ etched anti-vortex micro-vias (ground mesh holes to pin magnetic flux)
- * - 50-ohm coplanar waveguide (CPW) transmission lines
- * - Meandering quarter-wave readout resonators
- * - Transmon capacitor pocket clearance trenches with Al/AlOx/Al SQUID loops
- * - Perimeter pure gold wirebonding landing pads
+ * Scientifically authentic, photorealistic micro-fabrication map:
+ * - High-resistivity single-crystal silicon substrate (#0A0E17)
+ * - Sputtered thin-film superconducting niobium ground plane (#5A697E, metallic silver-grey)
+ * - Anti-vortex flux-pinning hole matrix (uniform 4μm etched holes)
+ * - 50-ohm coplanar waveguide (CPW) transmission lines (etched slot gaps revealing silicon substrate)
+ * - Meandering quarter-wave (λ/4) readout resonators
+ * - Transmon capacitor pocket clearance trenches with niobium capacitor cross pads
+ * - Perimeter wirebonding landing pads (pure gold metallization)
+ * - Alignment vernier fiducials and chip serialization markings
  */
 export function getSiliconDieTexture(): THREE.CanvasTexture {
   if (cachedSiliconDie) return cachedSiliconDie;
@@ -134,99 +136,104 @@ export function getSiliconDieTexture(): THREE.CanvasTexture {
   const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
-  // 1. Pristine High-Resistivity Silicon Substrate (#090D1A)
-  ctx.fillStyle = "#090D1A";
+  // 1. Pristine High-Resistivity Silicon Substrate (#0A0E17 - deep neutral semiconductor slate)
+  ctx.fillStyle = "#0A0E17";
   ctx.fillRect(0, 0, 1024, 1024);
 
-  // 2. Sputtered Superconducting Niobium Ground Plane (#141E34)
-  ctx.fillStyle = "#141E34";
-  ctx.fillRect(60, 60, 904, 904);
+  // 2. Sputtered Superconducting Niobium Ground Plane (#5B6B80 - metallic niobium film)
+  ctx.fillStyle = "#5B6B80";
+  ctx.fillRect(52, 52, 920, 920);
 
-  // 3. Etched Anti-Vortex Micro-Via Grid (flux pinning holes)
-  ctx.fillStyle = "#090D1A";
-  const viaStep = 16;
-  for (let x = 74; x < 950; x += viaStep) {
-    for (let y = 74; y < 950; y += viaStep) {
-      const dist = Math.hypot(x - 512, y - 512);
-      // Keep clear of center transmon lattice and outer feed lines
-      if (dist > 370 || (dist < 320 && (x % 32 === 0 || y % 32 === 0))) {
-        ctx.fillRect(x - 1, y - 1, 3, 3);
+  // 3. Anti-Vortex Flux-Pinning Micro-Via Grid (etched holes through niobium down to silicon)
+  ctx.fillStyle = "#0A0E17";
+  const viaStep = 14;
+  for (let x = 68; x < 956; x += viaStep) {
+    for (let y = 68; y < 956; y += viaStep) {
+      const distFromCenter = Math.hypot(x - 512, y - 512);
+      // Keep clear of transmon lattice, feedlines, and perimeter pads
+      const isClearOfPads = x > 110 && x < 914 && y > 110 && y < 914;
+      const isClearOfCenter = distFromCenter > 360 || (distFromCenter < 300 && (x % 28 === 0 || y % 28 === 0));
+      if (isClearOfPads && isClearOfCenter) {
+        ctx.fillRect(x - 1, y - 1, 2.5, 2.5);
       }
     }
   }
 
-  // 4. Coplanar Waveguide (CPW) Transmission Lines & Meandering Resonators
-  ctx.strokeStyle = "#090D1A";
-  ctx.lineWidth = 5;
+  // 4. Coplanar Waveguide (CPW) Transmission Lines & Meandering Readout Resonators
+  // Etched slot gaps reveal bare dark silicon substrate
+  ctx.strokeStyle = "#0A0E17";
+  ctx.lineWidth = 6;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
 
   const numResonators = 16;
   for (let i = 0; i < numResonators; i++) {
     const ang = (i / numResonators) * Math.PI * 2;
-    const r0 = 425;
-    const r1 = 230;
+    const rOuter = 415;
+    const rInner = 220;
 
-    const x0 = 512 + Math.cos(ang) * r0;
-    const y0 = 512 + Math.sin(ang) * r0;
-    const x1 = 512 + Math.cos(ang) * r1;
-    const y1 = 512 + Math.sin(ang) * r1;
+    const x0 = 512 + Math.cos(ang) * rOuter;
+    const y0 = 512 + Math.sin(ang) * rOuter;
+    const x1 = 512 + Math.cos(ang) * rInner;
+    const y1 = 512 + Math.sin(ang) * rInner;
 
-    // Meandering resonator wiggle
-    const midX = (x0 + x1) * 0.5 + Math.sin(i * 3.5) * 30;
-    const midY = (y0 + y1) * 0.5 + Math.cos(i * 3.5) * 30;
+    // Meandering serpentine resonator bends
+    const midX = (x0 + x1) * 0.5 + Math.sin(i * 3.7) * 26;
+    const midY = (y0 + y1) * 0.5 + Math.cos(i * 3.7) * 26;
 
     ctx.beginPath();
     ctx.moveTo(x0, y0);
     ctx.quadraticCurveTo(midX, midY, x1, y1);
     ctx.stroke();
 
-    // Etched transmon capacitor clearance pocket (square recess in ground plane)
-    ctx.fillStyle = "#090D1A";
+    // Etched transmon capacitor clearance pocket (square opening in ground plane)
+    ctx.fillStyle = "#0A0E17";
     ctx.fillRect(x1 - 18, y1 - 18, 36, 36);
 
-    // Superconducting Niobium Capacitor Pads inside pocket (#0284C7)
-    ctx.fillStyle = "#0284C7";
+    // Planar Transmon Superconducting Niobium Capacitor Pads (#8897AC - metallic film)
+    ctx.fillStyle = "#8897AC";
     ctx.fillRect(x1 - 12, y1 - 12, 10, 24);
     ctx.fillRect(x1 + 2, y1 - 12, 10, 24);
 
-    // Central sub-micron Josephson junction SQUID loop
-    ctx.fillStyle = "#F8FAFC";
+    // Central SQUID Loop with Josephson junction weak links
+    ctx.fillStyle = "#D1D5DB";
     ctx.fillRect(x1 - 2, y1 - 3, 4, 6);
+    ctx.fillStyle = "#0A0E17";
+    ctx.fillRect(x1 - 1, y1 - 2, 2, 4);
   }
 
-  // 5. Perimeter Die Wirebond Landing Pads (48 gold pads around die edges)
-  ctx.fillStyle = "#F59E0B";
+  // 5. Perimeter Die Wirebond Landing Pads (48 gold pads around die perimeter)
+  ctx.fillStyle = "#D4AF37"; // Realistic 24k gold bond pad
   const padW = 12;
   const padH = 16;
   const countPerSide = 12;
   for (let i = 0; i < countPerSide; i++) {
-    const offset = 96 + i * (832 / (countPerSide - 1));
+    const offset = 88 + i * (848 / (countPerSide - 1));
     // Top & Bottom pads
-    ctx.fillRect(offset - padW / 2, 66, padW, padH);
-    ctx.fillRect(offset - padW / 2, 958 - padH, padW, padH);
+    ctx.fillRect(offset - padW / 2, 58, padW, padH);
+    ctx.fillRect(offset - padW / 2, 966 - padH, padW, padH);
     // Left & Right pads
-    ctx.fillRect(66, offset - padW / 2, padH, padW);
-    ctx.fillRect(958 - padH, offset - padW / 2, padH, padW);
+    ctx.fillRect(58, offset - padW / 2, padH, padW);
+    ctx.fillRect(966 - padH, offset - padW / 2, padH, padW);
   }
 
-  // 6. High-Frequency Central Ground Ring
-  ctx.strokeStyle = "#F59E0B";
-  ctx.lineWidth = 3;
+  // 6. Common Microwave Readout Feedline Ring (metallic niobium trace)
+  ctx.strokeStyle = "#8897AC";
+  ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.arc(512, 512, 135, 0, Math.PI * 2);
+  ctx.arc(512, 512, 130, 0, Math.PI * 2);
   ctx.stroke();
 
-  // 7. Alignment Fiducial Crosses at the 4 corners
-  ctx.strokeStyle = "#F59E0B";
-  ctx.lineWidth = 2;
-  const corners = [
-    [90, 90],
-    [934, 90],
-    [90, 934],
-    [934, 934],
+  // 7. Lithographic Alignment Fiducial Crosses & Scale Verniers
+  ctx.strokeStyle = "#D4AF37";
+  ctx.lineWidth = 1.5;
+  const fiducialCorners = [
+    [82, 82],
+    [942, 82],
+    [82, 942],
+    [942, 942],
   ];
-  corners.forEach(([cx, cy]) => {
+  fiducialCorners.forEach(([cx, cy]) => {
     ctx.beginPath();
     ctx.moveTo(cx - 10, cy);
     ctx.lineTo(cx + 10, cy);
@@ -235,6 +242,11 @@ export function getSiliconDieTexture(): THREE.CanvasTexture {
     ctx.stroke();
     ctx.strokeRect(cx - 14, cy - 14, 28, 28);
   });
+
+  // Micro-scale serial code
+  ctx.fillStyle = "#D4AF37";
+  ctx.font = "bold 10px monospace";
+  ctx.fillText("QPU-156Q-SN2408", 430, 948);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 16;

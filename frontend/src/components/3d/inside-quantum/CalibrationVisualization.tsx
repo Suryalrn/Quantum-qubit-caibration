@@ -20,6 +20,7 @@ export default function CalibrationVisualization({ scrollProgress }: Calibration
   const groupRef = useRef<THREE.Group>(null);
   const vectorRef = useRef<THREE.Group>(null);
   const pulseWaveRef = useRef<THREE.Line>(null);
+  const currentOpacity = useRef<number>(0);
 
   // Materials
   const materials = useMemo(() => {
@@ -176,11 +177,35 @@ export default function CalibrationVisualization({ scrollProgress }: Calibration
       }
       positions.needsUpdate = true;
     }
-  });
 
-  // Visible during Scene 5 (0.68 to 0.92)
-  const isVisible = scrollProgress >= 0.68 && scrollProgress <= 0.92;
-  if (!isVisible) return null;
+    // Continuous smooth opacity interpolation
+    const p = scrollProgress;
+    let target = 0.0;
+    if (p >= 0.70 && p <= 0.90) {
+      if (p < 0.76) {
+        target = (p - 0.70) / 0.06;
+      } else if (p > 0.84) {
+        target = (0.90 - p) / 0.06;
+      } else {
+        target = 1.0;
+      }
+    }
+
+    currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, target, 0.08);
+    const alpha = currentOpacity.current;
+
+    if (groupRef.current) {
+      groupRef.current.visible = alpha > 0.008;
+    }
+
+    materials.sphereWire.opacity = alpha * 0.12;
+    materials.equatorRing.opacity = alpha * 0.75;
+    materials.equatorDisk.opacity = alpha * 0.04;
+    materials.axisLine.opacity = alpha * 0.45;
+    materials.probabilityCloud.opacity = alpha * 0.35;
+    materials.pulseColor.opacity = alpha * 0.90;
+    materials.resonanceColor.opacity = alpha * 0.85;
+  });
 
   return (
     <group ref={groupRef} position={[0.95, -0.05, 0.2]}>
